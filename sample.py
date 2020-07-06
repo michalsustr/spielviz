@@ -18,6 +18,9 @@
 
 
 import gi
+
+from xdot.ui import elements
+
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
@@ -27,18 +30,18 @@ import xdot
 
 class MyDotWindow(xdot.DotWindow):
 
-    def __init__(self):
-        xdot.DotWindow.__init__(self)
-        self.dotwidget.connect('clicked', self.on_url_clicked)
+  def __init__(self):
+    xdot.DotWindow.__init__(self)
+    self.dotwidget.connect('clicked', self.on_url_clicked)
 
-    def on_url_clicked(self, widget, url, event):
-        dialog = Gtk.MessageDialog(
-            parent=self,
-            buttons=Gtk.ButtonsType.OK,
-            message_format="%s clicked" % url)
-        dialog.connect('response', lambda dialog, response: dialog.destroy())
-        dialog.run()
-        return True
+  def on_url_clicked(self, widget, url, event):
+    dialog = Gtk.MessageDialog(
+        parent=self,
+        buttons=Gtk.ButtonsType.OK,
+        message_format="%s clicked" % url)
+    dialog.connect('response', lambda dialog, response: dialog.destroy())
+    dialog.run()
+    return True
 
 
 dotcode = b"""
@@ -51,11 +54,21 @@ digraph G {
 
 
 def main():
-    window = MyDotWindow()
-    window.set_dotcode(dotcode)
-    window.connect('delete-event', Gtk.main_quit)
-    Gtk.main()
+  window = MyDotWindow()
+  window.set_dotcode(dotcode)
+  # print(window.graph.shapes)
+
+  # width = 100
+  # height = 100
+  # shapes = []
+  # nodes = []
+  # edges = []
+  # outputorder = 'breadthfirst'
+  # window.graph = elements.Graph(width, height, shapes,
+  #                               nodes, edges, outputorder)
+  window.connect('delete-event', Gtk.main_quit)
+  Gtk.main()
 
 
 if __name__ == '__main__':
-    main()
+  main()
