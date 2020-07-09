@@ -1,33 +1,13 @@
-# Copyright 2008-2015 Jose Fonseca
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import math
 import operator
-from typing import Tuple, Union, Iterable
+from typing import Iterable
 
-import gi
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('PangoCairo', '1.0')
-
+import cairo
 from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from gi.repository import Pango
 from gi.repository import PangoCairo
-import cairo
 
 _inf = float('inf')
 _get_bounding = operator.attrgetter('bounding')
@@ -356,7 +336,7 @@ class BezierShape(Shape):
 
   @staticmethod
   def _cubic_bernstein_extrema(p0: float, p1: float, p2: float, p3: float) -> \
-  Iterable[float]:
+      Iterable[float]:
     """
     Find extremas of a function of real domain defined by evaluating
     a cubic bernstein polynomial of given bernstein coefficients.

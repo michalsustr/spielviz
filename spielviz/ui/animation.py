@@ -1,25 +1,7 @@
-# Copyright 2008-2015 Jose Fonseca
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import math
 import time
 
 import gi
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('PangoCairo', '1.0')
 
 from gi.repository import GLib
 
@@ -55,7 +37,6 @@ class Animation(object):
 
 
 class NoAnimation(Animation):
-
   def start(self):
     pass
 
@@ -80,7 +61,6 @@ class LinearAnimation(Animation):
 
 
 class MoveToAnimation(LinearAnimation):
-
   def __init__(self, dot_widget, target_x, target_y):
     Animation.__init__(self, dot_widget)
     self.source_x = dot_widget.x
@@ -97,7 +77,6 @@ class MoveToAnimation(LinearAnimation):
 
 
 class ZoomToAnimation(MoveToAnimation):
-
   def __init__(self, dot_widget, target_x, target_y):
     MoveToAnimation.__init__(self, dot_widget, target_x, target_y)
     self.source_zoom = dot_widget.zoom_ratio

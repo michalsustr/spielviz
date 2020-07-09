@@ -1,55 +1,34 @@
-# Copyright 2008-2015 Jose Fonseca
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 import math
 import os
 import re
 import subprocess
 import sys
 import time
-import gi
+from typing import Optional, Set, Tuple, Type
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('PangoCairo', '1.0')
-
+from cairo import Context
+from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import GLib
 from gi.repository import GObject
-from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import Gtk
+from gi.repository.Gdk import Rectangle
+from gi.repository.Gtk import ToolItem
+
+from spielviz.dot.lexer import ParseError
+from spielviz.dot.parser import XDotParser
+from spielviz.ui import actions
+from spielviz.ui import animation
+from spielviz.ui.actions import PanAction
+from spielviz.ui.elements import Graph
+from spielviz.ui.elements import Node, Url
+
 
 # See http://www.graphviz.org/pub/scm/graphviz-cairo/plugin/cairo/gvrender_cairo.c
 
 # For pygtk inspiration and guidance see:
 # - http://mirageiv.berlios.de/
 # - http://comix.sourceforge.net/
-
-from . import actions
-from ..dot.lexer import ParseError
-from ..dot.parser import XDotParser
-from . import animation
-from . import actions
-from .elements import Graph
-from cairo import Context
-from gi.overrides.Gdk import EventButton, EventMotion
-from gi.repository.Gdk import Rectangle
-from gi.repository.Gtk import ToolItem
-from typing import Optional, Set, Tuple, Type
-from spielviz.ui.actions import PanAction
-from spielviz.ui.elements import Node, Url
-
 
 class DotWidget(Gtk.DrawingArea):
   """GTK widget that draws dot graphs."""

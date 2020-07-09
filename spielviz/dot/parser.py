@@ -1,30 +1,12 @@
-# Copyright 2008-2015 Jose Fonseca
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import colorsys
 import sys
-
-from .lexer import ParseError, DotLexer
-
-from ..ui.colors import lookup_color
-from ..ui.pen import Pen
-from ..ui import elements
 from typing import Dict, List, Tuple, Union
-from spielviz.dot.lexer import DotLexer, Token
+
+from spielviz.dot.lexer import DotLexer, Token, ParseError
+from spielviz.ui import elements
 from spielviz.ui.elements import BezierShape, EllipseShape, Graph, PolygonShape, \
   TextShape
+from spielviz.ui.pen import Pen
 
 EOF = -1
 SKIP = -2
@@ -53,7 +35,6 @@ SUBGRAPH = 18
 
 
 class Parser:
-
   def __init__(self, lexer: DotLexer) -> None:
     self.lexer = lexer
     self.lookahead = next(self.lexer)
@@ -164,7 +145,8 @@ class XDotAttrParser:
       sys.stderr.write('warning: color gradients not supported yet\n')
       return None
     else:
-      return lookup_color(c)
+      sys.stderr.write('warning: unknown color\n')
+      return 0., 0., 0., 0.
 
   def parse(self) -> Union[
     List[PolygonShape], List[TextShape], List[BezierShape], List[EllipseShape]]:
@@ -283,7 +265,7 @@ class XDotAttrParser:
     if filled:
       # xdot uses this to mean "draw a filled shape with an outline"
       self.shapes.append(
-        elements.EllipseShape(self.pen, x0, y0, w, h, filled=True))
+          elements.EllipseShape(self.pen, x0, y0, w, h, filled=True))
     self.shapes.append(elements.EllipseShape(self.pen, x0, y0, w, h))
 
   def handle_image(self, x0, y0, w, h, path):
@@ -308,7 +290,6 @@ class XDotAttrParser:
 
 
 class DotParser(Parser):
-
   def __init__(self, lexer: DotLexer) -> None:
     Parser.__init__(self, lexer)
     self.graph_attrs = {}
@@ -488,7 +469,7 @@ class XDotParser(DotParser):
         self.top_graph = False
 
     for attr in (
-    "_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):
+        "_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):
       if attr in attrs:
         parser = XDotAttrParser(self, attrs[attr])
         self.shapes.extend(parser.parse())
@@ -534,7 +515,7 @@ class XDotParser(DotParser):
     points = self.parse_edge_pos(pos)
     shapes = []
     for attr in (
-    "_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):
+        "_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):
       if attr in attrs:
         parser = XDotAttrParser(self, attrs[attr])
         shapes.extend(parser.parse())

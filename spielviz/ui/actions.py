@@ -1,30 +1,10 @@
-# Copyright 2008-2015 Jose Fonseca
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import gi
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('PangoCairo', '1.0')
-
-from gi.repository import Gdk
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
+from gi.repository import Gdk
 
 
 class DragAction(object):
-
   def __init__(self, dot_widget) -> None:
     self.dot_widget = dot_widget
 
@@ -66,7 +46,6 @@ class DragAction(object):
 
 
 class NullAction(DragAction):
-
   def on_motion_notify(self, event: EventMotion) -> None:
     if event.is_hint:
       window, x, y, state = event.window.get_device_position(event.device)
@@ -85,7 +64,6 @@ class NullAction(DragAction):
 
 
 class PanAction(DragAction):
-
   def start(self) -> None:
     self.dot_widget.get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.FLEUR))
 
@@ -101,7 +79,6 @@ class PanAction(DragAction):
 
 
 class ZoomAction(DragAction):
-
   def drag(self, deltax, deltay):
     self.dot_widget.zoom_ratio *= 1.005 ** (deltax + deltay)
     self.dot_widget.zoom_to_fit_on_resize = False
@@ -112,7 +89,6 @@ class ZoomAction(DragAction):
 
 
 class ZoomAreaAction(DragAction):
-
   def drag(self, deltax, deltay):
     self.dot_widget.queue_draw()
 
