@@ -173,14 +173,6 @@ class TextShape(Shape):
             PangoCairo.show_layout(cr, layout)
             cr.restore()
 
-        if 0:  # DEBUG
-            # show where dot thinks the text should appear
-            cr.set_source_rgba(1, 0, 0, .9)
-            x = self.x - 0.5 * (1 + self.j) * width
-            cr.move_to(x, self.y)
-            cr.line_to(x + self.w, self.y)
-            cr.stroke()
-
     def search_text(self, regexp):
         return regexp.search(self.t) is not None
 

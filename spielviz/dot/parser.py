@@ -148,9 +148,10 @@ class XDotAttrParser:
             sys.stderr.write('warning: unknown color\n')
             return 0., 0., 0., 0.
 
-    def parse(self) -> Union[
-        List[PolygonShape], List[TextShape], List[BezierShape], List[
-            EllipseShape]]:
+    def parse(self) -> Union[List[PolygonShape],
+                             List[TextShape],
+                             List[BezierShape],
+                             List[EllipseShape]]:
         s = self
 
         while s:
@@ -280,7 +281,7 @@ class XDotAttrParser:
         if filled:
             # xdot uses this to mean "draw a filled shape with an outline"
             self.shapes.append(
-                elements.BezierShape(self.pen, points, filled=True))
+                  elements.BezierShape(self.pen, points, filled=True))
         self.shapes.append(elements.BezierShape(self.pen, points))
 
     def handle_polygon(self, points: List[Tuple[float, float]],
@@ -288,7 +289,7 @@ class XDotAttrParser:
         if filled:
             # xdot uses this to mean "draw a filled shape with an outline"
             self.shapes.append(
-                elements.PolygonShape(self.pen, points, filled=True))
+                  elements.PolygonShape(self.pen, points, filled=True))
         self.shapes.append(elements.PolygonShape(self.pen, points))
 
 
@@ -443,8 +444,8 @@ class XDotParser(DotParser):
             else:
                 if float(xdotversion) > float(self.XDOTVERSION):
                     sys.stderr.write(
-                        'warning: xdot version %s, but supported is %s\n' %
-                        (xdotversion, self.XDOTVERSION))
+                          'warning: xdot version %s, but supported is %s\n' %
+                          (xdotversion, self.XDOTVERSION))
 
             # Parse output order
             try:

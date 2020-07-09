@@ -1,5 +1,5 @@
 import re
-from typing import Tuple
+from typing import Tuple, List, Dict
 
 EOF = -1
 SKIP = -2
@@ -31,9 +31,9 @@ class Scanner:
     """Stateless scanner."""
 
     # should be overriden by derived classes
-    tokens = []
-    symbols = {}
-    literals = {}
+    tokens: List[Tuple[int, bytes, bool]] = []
+    symbols: Dict[bytes, int] = {}
+    literals: Dict[bytes, int] = {}
     ignorecase = False
 
     def __init__(self) -> None:
