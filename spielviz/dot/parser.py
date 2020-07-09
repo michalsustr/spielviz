@@ -22,8 +22,8 @@ from ..ui.colors import lookup_color
 from ..ui.pen import Pen
 from ..ui import elements
 from typing import Dict, List, Tuple, Union
-from xdot.dot.lexer import DotLexer, Token
-from xdot.ui.elements import BezierShape, EllipseShape, Graph, PolygonShape, \
+from spielviz.dot.lexer import DotLexer, Token
+from spielviz.ui.elements import BezierShape, EllipseShape, Graph, PolygonShape, \
   TextShape
 
 EOF = -1

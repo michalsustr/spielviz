@@ -47,8 +47,8 @@ from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository.Gdk import Rectangle
 from gi.repository.Gtk import ToolItem
 from typing import Optional, Set, Tuple, Type
-from xdot.ui.actions import PanAction
-from xdot.ui.elements import Node, Url
+from spielviz.ui.actions import PanAction
+from spielviz.ui.elements import Node, Url
 
 
 class DotWidget(Gtk.DrawingArea):
