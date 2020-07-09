@@ -33,7 +33,7 @@ class DragAction(object):
     self.startmousey = self.prevmousey = event.y
     self.start()
 
-  def on_motion_notify(self, event):
+  def on_motion_notify(self, event: EventButton):
     if event.is_hint:
       window, x, y, state = event.window.get_device_position(event.device)
     else:
