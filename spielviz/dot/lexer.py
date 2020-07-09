@@ -1,5 +1,6 @@
 import os
 import re
+import mmap
 from typing import Optional, Tuple
 
 from spielviz.dot.scanner import DotScanner
@@ -46,7 +47,7 @@ class Lexer:
             try:
                 fileno = fp.fileno()
                 length = os.path.getsize(fp.name)
-                import mmap
+
             except:
                 # read whole file into memory
                 buf = fp.read()

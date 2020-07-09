@@ -3,11 +3,7 @@ import operator
 from typing import Iterable
 
 import cairo
-from gi.repository import GObject
-from gi.repository import Gdk
-from gi.repository import GdkPixbuf
-from gi.repository import Pango
-from gi.repository import PangoCairo
+from gi.repository import GObject, Gdk, GdkPixbuf, Pango, PangoCairo
 
 _inf = float('inf')
 _get_bounding = operator.attrgetter('bounding')
@@ -84,7 +80,6 @@ class TextShape(Shape):
         self.t = t  # text
 
     def _draw(self, cr, highlight, bounding):
-
         try:
             layout = self.layout
         except AttributeError:
@@ -183,7 +178,6 @@ class TextShape(Shape):
 
 
 class ImageShape(Shape):
-
     def __init__(self, pen, x0, y0, w, h, path):
         Shape.__init__(self)
         self.pen = pen.copy()
@@ -211,7 +205,6 @@ class ImageShape(Shape):
 
 
 class EllipseShape(Shape):
-
     def __init__(self, pen, x0, y0, w, h, filled=False):
         Shape.__init__(self)
         self.pen = pen.copy()
@@ -247,7 +240,6 @@ class EllipseShape(Shape):
 
 
 class PolygonShape(Shape):
-
     def __init__(self, pen, points, filled=False):
         Shape.__init__(self)
         self.pen = pen.copy()
@@ -277,7 +269,6 @@ class PolygonShape(Shape):
 
 
 class LineShape(Shape):
-
     def __init__(self, pen, points):
         Shape.__init__(self)
         self.pen = pen.copy()
@@ -300,7 +291,6 @@ class LineShape(Shape):
 
 
 class BezierShape(Shape):
-
     def __init__(self, pen, points, filled=False):
         Shape.__init__(self)
         self.pen = pen.copy()
@@ -385,7 +375,6 @@ class BezierShape(Shape):
 
 
 class CompoundShape(Shape):
-
     def __init__(self, shapes):
         Shape.__init__(self)
         self.shapes = shapes
@@ -403,12 +392,3 @@ class CompoundShape(Shape):
             if shape.search_text(regexp):
                 return True
         return False
-
-__all__ = ["Shape",
-           "TextShape",
-           "ImageShape",
-           "EllipseShape",
-           "PolygonShape",
-           "LineShape",
-           "BezierShape",
-           "CompoundShape"]

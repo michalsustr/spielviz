@@ -1,8 +1,6 @@
 import math
 import time
 
-import gi
-
 from gi.repository import GLib
 
 

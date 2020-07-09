@@ -1,4 +1,3 @@
-import gi
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import Gdk

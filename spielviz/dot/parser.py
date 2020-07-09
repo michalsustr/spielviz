@@ -3,9 +3,7 @@ import sys
 from typing import Dict, List, Tuple, Union
 
 from spielviz.dot.lexer import DotLexer, Token, ParseError
-from spielviz.ui import elements
-from spielviz.ui.shape import *
-from spielviz.ui.elements import Graph
+from spielviz.ui import elements, shape
 from spielviz.ui.pen import Pen
 
 EOF = -1
@@ -148,10 +146,10 @@ class XDotAttrParser:
             sys.stderr.write('warning: unknown color\n')
             return 0., 0., 0., 0.
 
-    def parse(self) -> Union[List[PolygonShape],
-                             List[TextShape],
-                             List[BezierShape],
-                             List[EllipseShape]]:
+    def parse(self) -> Union[List[shape.PolygonShape],
+                             List[shape.TextShape],
+                             List[shape.BezierShape],
+                             List[shape.EllipseShape]]:
         s = self
 
         while s:
@@ -260,37 +258,37 @@ class XDotAttrParser:
             sys.stderr.write('warning: overlined text not supported yet\n')
 
     def handle_text(self, x: float, y: float, j: int, w: float, t: str) -> None:
-        self.shapes.append(elements.TextShape(self.pen, x, y, j, w, t))
+        self.shapes.append(shape.TextShape(self.pen, x, y, j, w, t))
 
     def handle_ellipse(self, x0: float, y0: float, w: float, h: float,
           filled: bool = False) -> None:
         if filled:
             # xdot uses this to mean "draw a filled shape with an outline"
             self.shapes.append(
-                  elements.EllipseShape(self.pen, x0, y0, w, h, filled=True))
-        self.shapes.append(elements.EllipseShape(self.pen, x0, y0, w, h))
+                  shape.EllipseShape(self.pen, x0, y0, w, h, filled=True))
+        self.shapes.append(shape.EllipseShape(self.pen, x0, y0, w, h))
 
     def handle_image(self, x0, y0, w, h, path):
-        self.shapes.append(elements.ImageShape(self.pen, x0, y0, w, h, path))
+        self.shapes.append(shape.ImageShape(self.pen, x0, y0, w, h, path))
 
     def handle_line(self, points):
-        self.shapes.append(elements.LineShape(self.pen, points))
+        self.shapes.append(shape.LineShape(self.pen, points))
 
     def handle_bezier(self, points: List[Tuple[float, float]],
           filled: bool = False) -> None:
         if filled:
             # xdot uses this to mean "draw a filled shape with an outline"
             self.shapes.append(
-                  elements.BezierShape(self.pen, points, filled=True))
-        self.shapes.append(elements.BezierShape(self.pen, points))
+                  shape.BezierShape(self.pen, points, filled=True))
+        self.shapes.append(shape.BezierShape(self.pen, points))
 
     def handle_polygon(self, points: List[Tuple[float, float]],
           filled: bool = False) -> None:
         if filled:
             # xdot uses this to mean "draw a filled shape with an outline"
             self.shapes.append(
-                  elements.PolygonShape(self.pen, points, filled=True))
-        self.shapes.append(elements.PolygonShape(self.pen, points))
+                  shape.PolygonShape(self.pen, points, filled=True))
+        self.shapes.append(shape.PolygonShape(self.pen, points))
 
 
 class DotParser(Parser):
@@ -531,7 +529,7 @@ class XDotParser(DotParser):
             dst = self.node_by_name[dst_id]
             self.edges.append(elements.Edge(src, dst, points, shapes))
 
-    def parse(self) -> Graph:
+    def parse(self) -> elements.Graph:
         DotParser.parse(self)
         return elements.Graph(self.width, self.height, self.shapes,
                               self.nodes, self.edges, self.outputorder)

@@ -9,7 +9,6 @@ _get_bounding = operator.attrgetter('bounding')
 
 
 class Url(object):
-
     def __init__(self, item, url, highlight=None):
         self.item = item
         self.url = url
@@ -19,7 +18,6 @@ class Url(object):
 
 
 class Jump(object):
-
     def __init__(self, item, x, y, highlight=None):
         self.item = item
         self.x = x
@@ -46,7 +44,6 @@ class Element(CompoundShape):
 
 
 class Node(Element):
-
     def __init__(self, id, x, y, w, h, shapes, url):
         Element.__init__(self, shapes)
 
@@ -87,7 +84,6 @@ def square_distance(x1, y1, x2, y2):
 
 
 class Edge(Element):
-
     def __init__(self, src, dst, points, shapes):
         Element.__init__(self, shapes)
         self.src = src
@@ -125,7 +121,6 @@ class Edge(Element):
 
 
 class Graph(Shape):
-
     def __init__(self, width=1, height=1, shapes=(), nodes=(), edges=(),
           outputorder='breadthfirst'):
         Shape.__init__(self)

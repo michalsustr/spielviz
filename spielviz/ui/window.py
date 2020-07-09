@@ -2,7 +2,6 @@ import os
 import re
 
 from gi.repository import Gtk
-from gi.repository.Gtk import ToolItem
 
 from spielviz.ui.area import DotWidget
 from spielviz.ui.elements import Graph
@@ -11,7 +10,7 @@ from spielviz.ui.elements import Graph
 class FindMenuToolAction(Gtk.Action):
     __gtype_name__ = "FindMenuToolAction"
 
-    def do_create_tool_item(self) -> ToolItem:
+    def do_create_tool_item(self) -> Gtk.ToolItem:
         return Gtk.ToolItem()
 
 

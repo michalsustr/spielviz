@@ -1,8 +1,4 @@
-'''Visualize dot graphs via the xdot format.'''
-
-import sys
-
-assert sys.version_info.major >= 3
+'''Visualize OpenSpiel games with game trees.'''
 
 __all__ = ['dot', 'ui']
 __author__ = "Michal Sustr et al"

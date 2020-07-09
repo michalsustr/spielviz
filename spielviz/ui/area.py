@@ -14,11 +14,8 @@ from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
 from spielviz.ui import actions, animation
 from spielviz.ui.actions import PanAction
-from spielviz.ui.elements import Graph
-from spielviz.ui.elements import Node, Url
+from spielviz.ui.elements import Graph, Node, Url
 
-
-# See http://www.graphviz.org/pub/scm/graphviz-cairo/plugin/cairo/gvrender_cairo.c
 
 # For pygtk inspiration and guidance see:
 # - http://mirageiv.berlios.de/
