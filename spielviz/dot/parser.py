@@ -4,8 +4,8 @@ from typing import Dict, List, Tuple, Union
 
 from spielviz.dot.lexer import DotLexer, Token, ParseError
 from spielviz.ui import elements
-from spielviz.ui.elements import BezierShape, EllipseShape, Graph, PolygonShape, \
-    TextShape
+from spielviz.ui.shape import *
+from spielviz.ui.elements import Graph
 from spielviz.ui.pen import Pen
 
 EOF = -1

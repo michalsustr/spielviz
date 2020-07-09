@@ -7,16 +7,12 @@ from typing import Optional, Set, Tuple, Type
 
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
-from gi.repository import GLib
-from gi.repository import GObject
-from gi.repository import Gdk
-from gi.repository import Gtk
+from gi.repository import GLib, GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
 
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
-from spielviz.ui import actions
-from spielviz.ui import animation
+from spielviz.ui import actions, animation
 from spielviz.ui.actions import PanAction
 from spielviz.ui.elements import Graph
 from spielviz.ui.elements import Node, Url
