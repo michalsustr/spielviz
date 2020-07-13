@@ -10,7 +10,7 @@ gi.require_version('PangoCairo', '1.0')
 
 from gi.repository import Gtk
 
-from spielviz.ui.window import DotWindow
+from spielviz.ui.window import MainWindow
 
 
 def main():
@@ -57,7 +57,7 @@ Shortcuts:
         except ValueError:
             parser.error('invalid window geometry')
 
-    win = DotWindow(width=width, height=height)
+    win = MainWindow(width=width, height=height)
     win.connect('delete-event', Gtk.main_quit)
     win.set_filter(options.filter)
     if inputfile and len(inputfile) >= 1:

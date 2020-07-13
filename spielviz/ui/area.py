@@ -12,15 +12,15 @@ from gi.repository.Gdk import Rectangle
 
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
-from spielviz.ui import actions, animation
 from spielviz.graphics.elements import Graph, Node, Element
+from spielviz.ui import actions, animation
 
 
 # For pygtk inspiration and guidance see:
 # - http://mirageiv.berlios.de/
 # - http://comix.sourceforge.net/
 
-class DotWidget(Gtk.DrawingArea):
+class PlotArea(Gtk.DrawingArea):
     """GTK widget that draws dot graphs."""
 
     # TODO GTK3: Second argument has to be of type Gdk.EventButton instead of object.
