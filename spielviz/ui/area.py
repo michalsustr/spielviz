@@ -13,8 +13,7 @@ from gi.repository.Gdk import Rectangle
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
 from spielviz.ui import actions, animation
-from spielviz.ui.actions import PanAction
-from spielviz.ui.elements import Graph, Node, Url
+from spielviz.graphics.elements import Graph, Node, Url
 
 
 # For pygtk inspiration and guidance see:
@@ -346,7 +345,7 @@ class DotWidget(Gtk.DrawingArea):
         rect = self.get_allocation()
         self._draw_graph(cr, rect)
 
-    def get_drag_action(self, event: EventButton) -> Type[PanAction]:
+    def get_drag_action(self, event: EventButton) -> Type[actions.PanAction]:
         state = event.state
         if event.button in (1, 2):  # left or middle button
             modifiers = Gtk.accelerator_get_default_mod_mask()

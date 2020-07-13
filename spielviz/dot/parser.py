@@ -3,8 +3,8 @@ import sys
 from typing import Dict, List, Tuple, Union
 
 from spielviz.dot.lexer import DotLexer, Token, ParseError
-from spielviz.ui import elements, shape
-from spielviz.ui.pen import Pen
+from spielviz.graphics import elements, shape
+from spielviz.graphics.pen import Pen
 
 EOF = -1
 SKIP = -2

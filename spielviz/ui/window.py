@@ -4,7 +4,7 @@ import re
 from gi.repository import Gtk
 
 from spielviz.ui.area import DotWidget
-from spielviz.ui.elements import Graph
+from spielviz.graphics.elements import Graph
 
 
 class FindMenuToolAction(Gtk.Action):

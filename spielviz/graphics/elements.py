@@ -2,7 +2,7 @@ import operator
 
 import cairo
 
-from spielviz.ui.shape import Shape, CompoundShape
+from spielviz.graphics.shape import Shape, CompoundShape
 
 _inf = float('inf')
 _get_bounding = operator.attrgetter('bounding')
