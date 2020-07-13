@@ -13,7 +13,7 @@ from gi.repository.Gdk import Rectangle
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
 from spielviz.ui import actions, animation
-from spielviz.graphics.elements import Graph, Node, Url
+from spielviz.graphics.elements import Graph, Node, Element
 
 
 # For pygtk inspiration and guidance see:
@@ -381,7 +381,7 @@ class DotWidget(Gtk.DrawingArea):
         return (time.time() < self.presstime + click_timeout and
                 math.hypot(deltax, deltay) < click_fuzz)
 
-    def on_click(self, element: Node, event: EventButton) -> bool:
+    def on_click(self, element: Element, event: EventButton) -> bool:
         """Override this method in subclass to process
         click events. Note that element can be None
         (click on empty space)."""
@@ -397,13 +397,9 @@ class DotWidget(Gtk.DrawingArea):
                 return True
 
             if event.button == 1:
-                url = self.get_url(x, y)
-                if url is not None:
-                    self.emit('clicked', url.url, event)
-                else:
-                    jump = self.get_jump(x, y)
-                    if jump is not None:
-                        self.animate_to(jump.x, jump.y)
+                jump = self.get_jump(x, y)
+                if jump is not None:
+                    self.animate_to(jump.x, jump.y)
 
                 return True
 
@@ -477,10 +473,6 @@ class DotWidget(Gtk.DrawingArea):
     def get_element(self, x: int, y: int) -> Node:
         x, y = self.window2graph(x, y)
         return self.graph.get_element(x, y)
-
-    def get_url(self, x: int, y: int) -> Optional[Url]:
-        x, y = self.window2graph(x, y)
-        return self.graph.get_url(x, y)
 
     def get_jump(self, x: int, y: int) -> None:
         x, y = self.window2graph(x, y)

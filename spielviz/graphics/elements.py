@@ -8,14 +8,6 @@ _inf = float('inf')
 _get_bounding = operator.attrgetter('bounding')
 
 
-class Url(object):
-    def __init__(self, item, url, highlight=None):
-        self.item = item
-        self.url = url
-        if highlight is None:
-            highlight = set([item])
-        self.highlight = highlight
-
 
 class Jump(object):
     def __init__(self, item, x, y, highlight=None):
@@ -36,15 +28,12 @@ class Element(CompoundShape):
     def is_inside(self, x, y):
         return False
 
-    def get_url(self, x, y):
-        return None
-
     def get_jump(self, x, y):
         return None
 
 
 class Node(Element):
-    def __init__(self, id, x, y, w, h, shapes, url):
+    def __init__(self, id, x, y, w, h, shapes):
         Element.__init__(self, shapes)
 
         self.id = id
@@ -56,17 +45,8 @@ class Node(Element):
         self.x2 = x + 0.5 * w
         self.y2 = y + 0.5 * h
 
-        self.url = url
-
     def is_inside(self, x, y):
         return self.x1 <= x and x <= self.x2 and self.y1 <= y and y <= self.y2
-
-    def get_url(self, x, y):
-        if self.url is None:
-            return None
-        if self.is_inside(x, y):
-            return Url(self, self.url)
-        return None
 
     def get_jump(self, x, y):
         if self.is_inside(x, y):
@@ -187,13 +167,6 @@ class Graph(Shape):
         for edge in self.edges:
             if edge.is_inside(x, y):
                 return edge
-
-    def get_url(self, x, y):
-        for node in self.nodes:
-            url = node.get_url(x, y)
-            if url is not None:
-                return url
-        return None
 
     def get_jump(self, x, y):
         for edge in self.edges:
