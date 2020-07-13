@@ -1,11 +1,12 @@
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import Gdk
+# from spielviz.ui.area import PlotArea
 
 
 class DragAction(object):
-    def __init__(self, dot_widget) -> None:
-        self.dot_widget = dot_widget
+    def __init__(self, plot_area) -> None:
+        self.plot_area = plot_area
 
     def on_button_press(self, event: EventButton) -> None:
         self.startmousex = self.prevmousex = event.x
@@ -50,45 +51,44 @@ class NullAction(DragAction):
             window, x, y, state = event.window.get_device_position(event.device)
         else:
             x, y, state = event.x, event.y, event.state
-        dot_widget = self.dot_widget
-        item = dot_widget.get_jump(x, y)
+        item = self.plot_area.get_jump(x, y)
         if item is not None:
-            dot_widget.get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.HAND2))
-            dot_widget.set_highlight(item.highlight)
+            self.plot_area.area.get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.HAND2))
+            self.plot_area.set_highlight(item.highlight)
         else:
-            dot_widget.get_window().set_cursor(None)
-            dot_widget.set_highlight(None)
+            # plot_area.get_window().set_cursor(None)
+            self.plot_area.set_highlight(None)
 
 
 class PanAction(DragAction):
     def start(self) -> None:
-        self.dot_widget.get_window().set_cursor(
+        self.plot_area.area.get_window().set_cursor(
             Gdk.Cursor(Gdk.CursorType.FLEUR))
 
     def drag(self, deltax, deltay):
-        self.dot_widget.x += deltax / self.dot_widget.zoom_ratio
-        self.dot_widget.y += deltay / self.dot_widget.zoom_ratio
-        self.dot_widget.queue_draw()
+        self.plot_area.x += deltax / self.plot_area.zoom_ratio
+        self.plot_area.y += deltay / self.plot_area.zoom_ratio
+        self.plot_area.area.queue_draw()
 
     def stop(self) -> None:
-        self.dot_widget.get_window().set_cursor(None)
+        self.plot_area.area.get_window().set_cursor(None)
 
     abort = stop
 
 
 class ZoomAction(DragAction):
     def drag(self, deltax, deltay):
-        self.dot_widget.zoom_ratio *= 1.005 ** (deltax + deltay)
-        self.dot_widget.zoom_to_fit_on_resize = False
-        self.dot_widget.queue_draw()
+        self.plot_area.zoom_ratio *= 1.005 ** (deltax + deltay)
+        self.plot_area.zoom_to_fit_on_resize = False
+        self.plot_area.area.queue_draw()
 
     def stop(self):
-        self.dot_widget.queue_draw()
+        self.plot_area.area.queue_draw()
 
 
 class ZoomAreaAction(DragAction):
     def drag(self, deltax, deltay):
-        self.dot_widget.queue_draw()
+        self.plot_area.area.queue_draw()
 
     def draw(self, cr):
         cr.save()
@@ -106,11 +106,11 @@ class ZoomAreaAction(DragAction):
         cr.restore()
 
     def stop(self):
-        x1, y1 = self.dot_widget.window2graph(self.startmousex,
+        x1, y1 = self.plot_area.window2graph(self.startmousex,
                                               self.startmousey)
-        x2, y2 = self.dot_widget.window2graph(self.stopmousex,
+        x2, y2 = self.plot_area.window2graph(self.stopmousex,
                                               self.stopmousey)
-        self.dot_widget.zoom_to_area(x1, y1, x2, y2)
+        self.plot_area.zoom_to_area(x1, y1, x2, y2)
 
     def abort(self):
-        self.dot_widget.queue_draw()
+        self.plot_area.area.queue_draw()

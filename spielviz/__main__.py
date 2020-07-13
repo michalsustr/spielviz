@@ -8,16 +8,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('PangoCairo', '1.0')
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 from spielviz.ui.window import MainWindow
 
-
-def main():
-    parser = argparse.ArgumentParser(
-          description="xdot.py is an interactive viewer for graphs written in Graphviz's dot language.",
-          formatter_class=argparse.RawDescriptionHelpFormatter,
-          epilog='''
+usage_tips = '''
 Shortcuts:
   Up, Down, Left, Right     scroll
   PageUp, +, =              zoom in
@@ -30,10 +25,15 @@ Shortcuts:
   Ctrl-drag                 zoom in/out
   Shift-drag                zooms an area
 '''
-    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+          description="SpielViz is an interactive viewer for OpenSpiel games",
+          formatter_class=argparse.RawDescriptionHelpFormatter,
+          epilog=usage_tips)
     parser.add_argument(
-          'inputfile', metavar='file', nargs='?',
-          help='input file to be viewed')
+          'game', metavar='game', default="kuhn_poker", help='game to view')
     parser.add_argument(
           '-f', '--filter', choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
           dest='filter', default='dot', metavar='FILTER',
@@ -42,32 +42,16 @@ Shortcuts:
           '-n', '--no-filter',
           action='store_const', const=None, dest='filter',
           help='assume input is already filtered into xdot format (use e.g. dot -Txdot)')
-    parser.add_argument(
-          '-g', '--geometry',
-          action='store', dest='geometry',
-          help='default window size in form WxH')
 
     options = parser.parse_args()
-    inputfile = options.inputfile
 
-    width, height = 610, 610
-    if options.geometry:
-        try:
-            width, height = (int(i) for i in options.geometry.split('x'))
-        except ValueError:
-            parser.error('invalid window geometry')
-
-    win = MainWindow(width=width, height=height)
-    win.connect('delete-event', Gtk.main_quit)
+    win = MainWindow()
     win.set_filter(options.filter)
-    if inputfile and len(inputfile) >= 1:
-        if inputfile == '-':
-            win.set_dotcode(sys.stdin.buffer.read())
-        else:
-            win.open_file(inputfile)
+    win.set_game(options.game)
 
     if sys.platform != 'win32':
-        # Reset KeyboardInterrupt SIGINT handler, so that glib loop can be stopped by it
+        # Reset KeyboardInterrupt SIGINT handler,
+        # so that glib loop can be stopped by it
         import signal
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 

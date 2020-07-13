@@ -20,7 +20,7 @@ from spielviz.ui import actions, animation
 # - http://mirageiv.berlios.de/
 # - http://comix.sourceforge.net/
 
-class PlotArea(Gtk.DrawingArea):
+class PlotArea:
     """GTK widget that draws dot graphs."""
 
     # TODO GTK3: Second argument has to be of type Gdk.EventButton instead of object.
@@ -32,28 +32,27 @@ class PlotArea(Gtk.DrawingArea):
 
     filter = 'dot'
 
-    def __init__(self) -> None:
-        Gtk.DrawingArea.__init__(self)
-
+    def __init__(self, draw_area: Gtk.DrawingArea) -> None:
+        self.area = draw_area
         self.graph = Graph()
         self.openfilename = None
 
-        self.set_can_focus(True)
+        self.area.set_can_focus(True)
 
-        self.connect("draw", self.on_draw)
-        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
-                        Gdk.EventMask.BUTTON_RELEASE_MASK)
-        self.connect("button-press-event", self.on_area_button_press)
-        self.connect("button-release-event", self.on_area_button_release)
-        self.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
-                        Gdk.EventMask.POINTER_MOTION_HINT_MASK |
-                        Gdk.EventMask.BUTTON_RELEASE_MASK |
-                        Gdk.EventMask.SCROLL_MASK)
-        self.connect("motion-notify-event", self.on_area_motion_notify)
-        self.connect("scroll-event", self.on_area_scroll_event)
-        self.connect("size-allocate", self.on_area_size_allocate)
+        self.area.connect("draw", self.on_draw)
+        self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
+                             Gdk.EventMask.BUTTON_RELEASE_MASK)
+        self.area.connect("button-press-event", self.on_area_button_press)
+        self.area.connect("button-release-event", self.on_area_button_release)
+        self.area.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                             Gdk.EventMask.POINTER_MOTION_HINT_MASK |
+                             Gdk.EventMask.BUTTON_RELEASE_MASK |
+                             Gdk.EventMask.SCROLL_MASK)
+        self.area.connect("motion-notify-event", self.on_area_motion_notify)
+        self.area.connect("scroll-event", self.on_area_scroll_event)
+        self.area.connect("size-allocate", self.on_area_size_allocate)
 
-        self.connect('key-press-event', self.on_key_press_event)
+        self.area.connect('key-press-event', self.on_key_press_event)
         self.last_mtime = None
 
         GLib.timeout_add(1000, self.update)
@@ -70,7 +69,7 @@ class PlotArea(Gtk.DrawingArea):
         self.history_forward = []
 
     def error_dialog(self, message):
-        self.emit('error', message)
+        self.area.emit('error', message)
 
     def set_filter(self, filter):
         self.filter = filter
@@ -132,7 +131,6 @@ class PlotArea(Gtk.DrawingArea):
         assert isinstance(xdotcode, bytes)
         parser = XDotParser(xdotcode)
         self.graph = parser.parse()
-        # pprint(self.graph.nodes[0].__dict__)
         self.zoom_image(self.zoom_ratio, center=center)
 
     def reload(self) -> None:
@@ -171,8 +169,8 @@ class PlotArea(Gtk.DrawingArea):
         self.graph.draw(cr, highlight_items=self.highlight, bounding=bounding)
 
     def on_draw(self, widget, cr: Context) -> bool:
-        rect = self.get_allocation()
-        Gtk.render_background(self.get_style_context(), cr, 0, 0,
+        rect = self.area.get_allocation()
+        Gtk.render_background(self.area.get_style_context(), cr, 0, 0,
                               rect.width, rect.height)
 
         cr.save()
@@ -189,7 +187,7 @@ class PlotArea(Gtk.DrawingArea):
     def set_current_pos(self, x, y):
         self.x = x
         self.y = y
-        self.queue_draw()
+        self.area.queue_draw()
 
     def set_highlight(self, items: Optional[Set[Node]],
           search: bool = False) -> None:
@@ -201,7 +199,7 @@ class PlotArea(Gtk.DrawingArea):
             return
         if self.highlight != items:
             self.highlight = items
-            self.queue_draw()
+            self.area.queue_draw()
 
     def zoom_image(self, zoom_ratio: float, center: bool = False,
           pos: None = None) -> None:
@@ -213,7 +211,7 @@ class PlotArea(Gtk.DrawingArea):
             self.x = self.graph.width / 2
             self.y = self.graph.height / 2
         elif pos is not None:
-            rect = self.get_allocation()
+            rect = self.area.get_allocation()
             x, y = pos
             x -= 0.5 * rect.width
             y -= 0.5 * rect.height
@@ -221,10 +219,10 @@ class PlotArea(Gtk.DrawingArea):
             self.y += y / self.zoom_ratio - y / zoom_ratio
         self.zoom_ratio = zoom_ratio
         self.zoom_to_fit_on_resize = False
-        self.queue_draw()
+        self.area.queue_draw()
 
     def zoom_to_area(self, x1, y1, x2, y2):
-        rect = self.get_allocation()
+        rect = self.area.get_allocation()
         width = abs(x1 - x2)
         height = abs(y1 - y2)
         if width == 0 and height == 0:
@@ -237,10 +235,10 @@ class PlotArea(Gtk.DrawingArea):
         self.zoom_to_fit_on_resize = False
         self.x = (x1 + x2) / 2
         self.y = (y1 + y2) / 2
-        self.queue_draw()
+        self.area.queue_draw()
 
     def zoom_to_fit(self) -> None:
-        rect = self.get_allocation()
+        rect = self.area.get_allocation()
         rect.x += self.ZOOM_TO_FIT_MARGIN
         rect.y += self.ZOOM_TO_FIT_MARGIN
         rect.width -= 2 * self.ZOOM_TO_FIT_MARGIN
@@ -272,32 +270,32 @@ class PlotArea(Gtk.DrawingArea):
     def on_key_press_event(self, widget, event):
         if event.keyval == Gdk.KEY_Left:
             self.x -= self.POS_INCREMENT / self.zoom_ratio
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval == Gdk.KEY_Right:
             self.x += self.POS_INCREMENT / self.zoom_ratio
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval == Gdk.KEY_Up:
             self.y -= self.POS_INCREMENT / self.zoom_ratio
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval == Gdk.KEY_Down:
             self.y += self.POS_INCREMENT / self.zoom_ratio
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval in (Gdk.KEY_Page_Up,
                             Gdk.KEY_plus,
                             Gdk.KEY_equal,
                             Gdk.KEY_KP_Add):
             self.zoom_image(self.zoom_ratio * self.ZOOM_INCREMENT)
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval in (Gdk.KEY_Page_Down,
                             Gdk.KEY_minus,
                             Gdk.KEY_KP_Subtract):
             self.zoom_image(self.zoom_ratio / self.ZOOM_INCREMENT)
-            self.queue_draw()
+            self.area.queue_draw()
             return True
         if event.keyval == Gdk.KEY_Escape:
             self.drag_action.abort()
@@ -307,7 +305,7 @@ class PlotArea(Gtk.DrawingArea):
             self.reload()
             return True
         if event.keyval == Gdk.KEY_f:
-            win = widget.get_toplevel()
+            win = widget.self.area.get_toplevel()
             find_toolitem = win.uimanager.get_widget('/ToolBar/Find')
             textentry = find_toolitem.get_children()
             win.set_focus(textentry[0])
@@ -332,7 +330,7 @@ class PlotArea(Gtk.DrawingArea):
         print_op.connect("draw_page", self.draw_page)
 
         res = print_op.run(Gtk.PrintOperationAction.PRINT_DIALOG,
-                           self.get_toplevel())
+                           self.area.get_toplevel())
         if res == Gtk.PrintOperationResult.APPLY:
             self.print_settings = print_op.get_print_settings()
 
@@ -342,7 +340,7 @@ class PlotArea(Gtk.DrawingArea):
 
     def draw_page(self, operation, context, page_nr):
         cr = context.get_cairo_context()
-        rect = self.get_allocation()
+        rect = self.area.get_allocation()
         self._draw_graph(cr, rect)
 
     def get_drag_action(self, event: EventButton) -> Type[actions.PanAction]:
@@ -437,10 +435,11 @@ class PlotArea(Gtk.DrawingArea):
         self.animation.start()
 
     def history_changed(self):
-        self.emit(
-              'history',
-              bool(self.history_back),
-              bool(self.history_forward))
+        # self.area.get_allocation(
+        #       'history',
+        #       bool(self.history_back),
+        #       bool(self.history_forward))
+        pass
 
     def on_go_back(self, action=None):
         try:
@@ -461,7 +460,7 @@ class PlotArea(Gtk.DrawingArea):
         self._animate_to(*item)
 
     def window2graph(self, x: int, y: int) -> Tuple[float, float]:
-        rect = self.get_allocation()
+        rect = self.area.get_allocation()
         x -= 0.5 * rect.width
         y -= 0.5 * rect.height
         x /= self.zoom_ratio

@@ -7,8 +7,8 @@ from gi.repository import GLib
 class Animation(object):
     step = 0.03  # seconds
 
-    def __init__(self, dot_widget) -> None:
-        self.dot_widget = dot_widget
+    def __init__(self, plot_area) -> None:
+        self.plot_area = plot_area
         self.timeout_id = None
 
     def start(self):
@@ -16,7 +16,7 @@ class Animation(object):
                                            self.__real_tick)
 
     def stop(self):
-        self.dot_widget.animation = NoAnimation(self.dot_widget)
+        self.plot_area.animation = NoAnimation(self.plot_area)
         if self.timeout_id is not None:
             GLib.source_remove(self.timeout_id)
             self.timeout_id = None
@@ -60,25 +60,25 @@ class LinearAnimation(Animation):
 
 
 class MoveToAnimation(LinearAnimation):
-    def __init__(self, dot_widget, target_x, target_y):
-        Animation.__init__(self, dot_widget)
-        self.source_x = dot_widget.x
-        self.source_y = dot_widget.y
+    def __init__(self, plot_area, target_x, target_y):
+        Animation.__init__(self, plot_area)
+        self.source_x = plot_area.x
+        self.source_y = plot_area.y
         self.target_x = target_x
         self.target_y = target_y
 
     def animate(self, t):
         sx, sy = self.source_x, self.source_y
         tx, ty = self.target_x, self.target_y
-        self.dot_widget.x = tx * t + sx * (1 - t)
-        self.dot_widget.y = ty * t + sy * (1 - t)
-        self.dot_widget.queue_draw()
+        self.plot_area.x = tx * t + sx * (1 - t)
+        self.plot_area.y = ty * t + sy * (1 - t)
+        self.plot_area.area.queue_draw()
 
 
 class ZoomToAnimation(MoveToAnimation):
-    def __init__(self, dot_widget, target_x, target_y):
-        MoveToAnimation.__init__(self, dot_widget, target_x, target_y)
-        self.source_zoom = dot_widget.zoom_ratio
+    def __init__(self, plot_area, target_x, target_y):
+        MoveToAnimation.__init__(self, plot_area, target_x, target_y)
+        self.source_zoom = plot_area.zoom_ratio
         self.target_zoom = self.source_zoom
         self.extra_zoom = 0
 
@@ -86,8 +86,8 @@ class ZoomToAnimation(MoveToAnimation):
 
         distance = math.hypot(self.source_x - self.target_x,
                               self.source_y - self.target_y)
-        rect = self.dot_widget.get_allocation()
-        visible = min(rect.width, rect.height) / self.dot_widget.zoom_ratio
+        rect = self.plot_area.area.get_allocation()
+        visible = min(rect.width, rect.height) / self.plot_area.zoom_ratio
         visible *= 0.9
         if distance > 0:
             desired_middle_zoom = visible / distance
@@ -95,6 +95,6 @@ class ZoomToAnimation(MoveToAnimation):
 
     def animate(self, t):
         a, b, c = self.source_zoom, self.extra_zoom, self.target_zoom
-        self.dot_widget.zoom_ratio = c * t + b * t * (1 - t) + a * (1 - t)
-        self.dot_widget.zoom_to_fit_on_resize = False
+        self.plot_area.zoom_ratio = c * t + b * t * (1 - t) + a * (1 - t)
+        self.plot_area.zoom_to_fit_on_resize = False
         MoveToAnimation.animate(self, t)
