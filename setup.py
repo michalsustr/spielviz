@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# The purpose of this script is to enable uploading xdot.py to the Python
+# The purpose of this script is to enable uploading SpielViz to the Python
 # Package Index, which can be easily done by doing:
 #
 #   python3 setup.py sdist upload
@@ -13,30 +13,23 @@
 from setuptools import setup
 
 setup(
-    name='xdot',
-    version='1.1',
-    author='Jose Fonseca',
-    author_email='jose.r.fonseca@gmail.com',
-    url='https://github.com/jrfonseca/xdot.py',
-    description="Interactive viewer for Graphviz dot files",
+    name='spielviz',
+    version='0.0.1',
+    author='Michal Sustr',
+    author_email='michal.sustr@gmail.com',
+    url='https://github.com/michalsustr/spielviz',
+    description="SpielViz is an interactive viewer for OpenSpiel games",
     long_description="""
-        xdot.py is an interactive viewer for graphs written in Graphviz's dot
-        language.
-
-        It uses internally the graphviz's xdot output format as an intermediate
-        format, and PyGTK and Cairo for rendering.
-
-        xdot.py can be used either as a standalone application from command
-        line, or as a library embedded in your python application.
+        SpielViz is an interactive viewer for OpenSpiel games.
         """,
     license="LGPL",
 
-    packages=['xdot', 'xdot/dot', 'xdot/ui'],
-    entry_points=dict(gui_scripts=['xdot=xdot.__main__:main']),
+    packages=['spielviz'],
+    entry_points=dict(gui_scripts=['spielviz=spielviz.__main__:main']),
 
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 6 - Mature',
+        'Development Status :: 1 - Planning',
 
         'Environment :: X11 Applications :: GTK',
 
@@ -46,9 +39,7 @@ setup(
 
         'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
 
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3 :: Only',
 
         'Topic :: Multimedia :: Graphics :: Viewers',

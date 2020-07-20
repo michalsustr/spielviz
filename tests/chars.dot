@@ -1,7 +1,0 @@
-digraph G {
-quote [label="\""]
-newline [label="_\n_"]
-tab [label="_\t_"]
-slash [label="\\"]
-slashes [label="\\\\"]
-}
