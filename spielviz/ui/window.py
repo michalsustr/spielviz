@@ -82,7 +82,7 @@ def Spinner(item: Gtk.ToolItem, **kwargs):
 
 
 def export_tree(state):
-  gametree = treeviz.GameTree(state.get_game(), depth_limit=1)
+  gametree = treeviz.GameTree(state.get_game(), depth_limit=0)
   return gametree.to_string().encode()
 
 
@@ -128,6 +128,9 @@ class MainWindow:
 
   def set_state(self, state: pyspiel.State):
     self.state = state
+    state.apply_action(state.legal_actions()[0])
+    # state.apply_action(state.legal_actions()[0])
+    # state.apply_action(state.legal_actions()[0])
     self.state_history.update(state)
 
   def render(self):

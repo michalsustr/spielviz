@@ -67,3 +67,9 @@ PLAYER_COLORS = user_cfg.PLAYER_COLORS or [
   # If you need to support more players for your game,
   # just add more colors here.
 ]
+
+# Show options
+SHOW_ACTIONS = user_cfg.SHOW_ACTIONS or True
+SHOW_INFORMATION_STATE_STRING = user_cfg.SHOW_INFORMATION_STATE_STRING or True
+SHOW_PUBLIC_OBSERVATION_HISTORY = user_cfg.SHOW_PUBLIC_OBSERVATION_HISTORY or True
+SHOW_ACTION_OBSERVATION_HISTORY = user_cfg.SHOW_ACTION_OBSERVATION_HISTORY or True
