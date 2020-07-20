@@ -5,18 +5,11 @@ import pyspiel
 from gi.repository import Gtk
 from open_spiel.python.visualizations import treeviz
 
+import spielviz.config as cfg
 from spielviz.logic.game_selector import game_parameter_populator, list_games
+from spielviz.resources import get_resource_path
 from spielviz.ui.area import PlotArea
 from spielviz.ui.completing_combo_box import CompletingComboBoxText
-
-
-def get_resource_path(rel_path):
-    dir_of_py_file = os.path.dirname(__file__)
-    rel_path_to_resource = os.path.join(
-          dir_of_py_file, "../resources", rel_path)
-    abs_path_to_resource = os.path.abspath(rel_path_to_resource)
-    return abs_path_to_resource
-
 
 BASE_TITLE = 'SpielViz'
 UI_FILE = get_resource_path("definition.xml")

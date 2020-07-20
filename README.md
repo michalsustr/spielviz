@@ -5,26 +5,19 @@ _SpielViz_ is an interactive viewer for [OpenSpiel](https://github.com/deepmind/
 
 It is based on [xdot.py](https://github.com/jrfonseca/xdot.py/), a GraphViz's viewer in Python.
 
-Screenshots
-===========
+TODOs
+=====
 
-[![Profile 1 Screenshot](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-profile1_small.png)](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-profile1.png)
-[![Profile 2 Screenshot](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-profile2_small.png)](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-profile2.png)
-[![Control Flow Graph](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-cfg_small.png)](https://raw.github.com/wiki/jrfonseca/xdot.py/xdot-cfg.png)
-
+ * [x] Custom configuration
+ * [ ] Arrow movement withing Graph
+ * [ ] Scrolling
+ * [ ] State view components -- down_class python bindings
+ * [ ] Public / private trees
+ 
 
 Features
 ========
 
-TODO:
-
- * Configuration
- * Arrow movement withing Graph
- * Scrolling
- * State view components -- down_class python bindings
- * Public / private trees
- 
- 
  * Since it doesn't use bitmaps it is fast and has a small memory footprint.
  * Arbitrary zoom.
  * Keyboard/mouse navigation.
