@@ -9,8 +9,18 @@ from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.ui.area import PlotArea
 from spielviz.ui.completing_combo_box import CompletingComboBoxText
 
+
+def get_resource_path(rel_path):
+    dir_of_py_file = os.path.dirname(__file__)
+    rel_path_to_resource = os.path.join(
+          dir_of_py_file, "../resources", rel_path)
+    abs_path_to_resource = os.path.abspath(rel_path_to_resource)
+    return abs_path_to_resource
+
+
 BASE_TITLE = 'SpielViz'
-UI_FILE = os.path.join(os.path.dirname(__file__), "definition.xml")
+UI_FILE = get_resource_path("definition.xml")
+ICON_FILE = get_resource_path("game_512x512.png")
 
 
 def StateView(container: Gtk.ScrolledWindow):
@@ -61,7 +71,7 @@ def Spinner(item: Gtk.ToolItem, **kwargs):
 
 
 def export_tree(state):
-    gametree = treeviz.GameTree(state.get_game())
+    gametree = treeviz.GameTree(state.get_game(), depth_limit=1)
     return gametree.to_string().encode()
 
 
@@ -84,6 +94,7 @@ class MainWindow:
         self.window = builder.get_object("window")
         self.window.connect('delete-event', Gtk.main_quit)
         self.window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+        self.window.set_icon_from_file(ICON_FILE)
         self.window.show_all()
 
     def set_game(self, game: str):
