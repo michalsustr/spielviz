@@ -2,6 +2,7 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window">
+    <property name="name">window</property>
     <property name="width_request">-1</property>
     <property name="height_request">600</property>
     <property name="can_focus">False</property>
@@ -16,6 +17,7 @@
           <object class="GtkFrame">
             <child>
               <object class="GtkToolbar" id="toolbar">
+                <property name="name">toolbar</property>
                 <child>
                   <object class="GtkToolItem">
                     <property name="margin-right">2</property>
@@ -29,6 +31,7 @@
 
                 <child>
                   <object class="GtkToolItem" id="select_game">
+                    <property name="name">select_game</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -49,6 +52,7 @@
 
                 <child>
                   <object class="GtkToolItem" id="select_history">
+                    <property name="name">select_history</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -70,6 +74,7 @@
 
                 <child>
                   <object class="GtkToolItem" id="lookahead">
+                    <property name="name">lookahead</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -92,6 +97,7 @@
 
                 <child>
                   <object class="GtkToolItem" id="lookbehind">
+                    <property name="name">lookbehind</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -110,6 +116,7 @@
 
                 <child>
                   <object class="GtkToolButton" id="zoom_in">
+                    <property name="name">zoom_in</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -127,6 +134,7 @@
 
                 <child>
                   <object class="GtkToolButton" id="zoom_out">
+                    <property name="name">zoom_out</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -144,6 +152,7 @@
 
                 <child>
                   <object class="GtkToolButton" id="fullscreen_button">
+                    <property name="name">fullscreen_button</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -161,6 +170,7 @@
 
                 <child>
                   <object class="GtkToolButton" id="undo_button">
+                    <property name="name">undo_button</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -178,6 +188,8 @@
 
                 <child>
                   <object class="GtkToolButton" id="redo_button">
+                    <property name="name">redo_button</property>
+                    <property name="name">redo_button</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
@@ -202,18 +214,51 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkScrolledWindow" id="state_view">
+              <object class="GtkBox" id="state_info">
+                <property name="name">state_info</property>
                 <property name="width_request">350</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="state_view">
+                    <property name="name">state_view</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow" id="state_history">
+                    <property name="name">state_history</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                  </packing>
+                </child>
               </object>
+
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
               </packing>
             </child>
+
             <child>
               <object class="GtkDrawingArea" id="world_tree">
+                <property name="name">world_tree</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
               </object>

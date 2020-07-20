@@ -40,13 +40,13 @@ def main():
            '[default: %(default)s]')
   parser.add_argument(
       '-l', '--layout', choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
-      dest='layout', default=cfg.DEFAULT_LAYOUT, metavar='LAYOUT',
+      dest='layout', default=cfg.LAYOUT, metavar='LAYOUT',
       help='graphviz layout: dot, neato, twopi, circo, or fdp '
            '[default: %(default)s]')
 
   options = parser.parse_args()
 
-  logging.getLogger().setLevel(cfg.DEFAULT_LOGGING)
+  logging.getLogger().setLevel(cfg.LOGGING_LEVEL)
 
   win = MainWindow()
   win.set_filter(options.layout)
