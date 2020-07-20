@@ -28,88 +28,88 @@ SUBGRAPH = 18
 
 
 class Scanner:
-    """Stateless scanner."""
+  """Stateless scanner."""
 
-    # should be overriden by derived classes
-    tokens: List[Tuple[int, bytes, bool]] = []
-    symbols: Dict[bytes, int] = {}
-    literals: Dict[bytes, int] = {}
-    ignorecase = False
+  # should be overriden by derived classes
+  tokens: List[Tuple[int, bytes, bool]] = []
+  symbols: Dict[bytes, int] = {}
+  literals: Dict[bytes, int] = {}
+  ignorecase = False
 
-    def __init__(self) -> None:
-        flags = re.DOTALL
-        if self.ignorecase:
-            flags |= re.IGNORECASE
-        self.tokens_re = re.compile(
-              b'|'.join([b'(' + regexp + b')'
-                         for type, regexp, test_lit in self.tokens]),
-              flags
-        )
+  def __init__(self) -> None:
+    flags = re.DOTALL
+    if self.ignorecase:
+      flags |= re.IGNORECASE
+    self.tokens_re = re.compile(
+        b'|'.join([b'(' + regexp + b')'
+                   for type, regexp, test_lit in self.tokens]),
+        flags
+    )
 
-    def next(self, buf: bytes, pos: int) -> Tuple[int, bytes, int]:
-        if pos >= len(buf):
-            return EOF, b'', pos
-        mo = self.tokens_re.match(buf, pos)
-        if mo:
-            text = mo.group()
-            type, regexp, test_lit = self.tokens[mo.lastindex - 1]
-            pos = mo.end()
-            if test_lit:
-                type = self.literals.get(text, type)
-            return type, text, pos
-        else:
-            c = buf[pos:pos + 1]
-            return self.symbols.get(c, None), c, pos + 1
+  def next(self, buf: bytes, pos: int) -> Tuple[int, bytes, int]:
+    if pos >= len(buf):
+      return EOF, b'', pos
+    mo = self.tokens_re.match(buf, pos)
+    if mo:
+      text = mo.group()
+      type, regexp, test_lit = self.tokens[mo.lastindex - 1]
+      pos = mo.end()
+      if test_lit:
+        type = self.literals.get(text, type)
+      return type, text, pos
+    else:
+      c = buf[pos:pos + 1]
+      return self.symbols.get(c, None), c, pos + 1
 
 
 class DotScanner(Scanner):
-    # token regular expression table
-    tokens = [
-        # whitespace and comments
-        (SKIP,
-         br'[ \t\f\r\n\v]+|'
-         br'//[^\r\n]*|'
-         br'/\*.*?\*/|'
-         br'#[^\r\n]*',
-         False),
+  # token regular expression table
+  tokens = [
+    # whitespace and comments
+    (SKIP,
+     br'[ \t\f\r\n\v]+|'
+     br'//[^\r\n]*|'
+     br'/\*.*?\*/|'
+     br'#[^\r\n]*',
+     False),
 
-        # Alphanumeric IDs
-        (ID, br'[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*', True),
+    # Alphanumeric IDs
+    (ID, br'[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*', True),
 
-        # Numeric IDs
-        (ID, br'-?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)', False),
+    # Numeric IDs
+    (ID, br'-?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)', False),
 
-        # String IDs
-        (STR_ID, br'"[^"\\]*(?:\\.[^"\\]*)*"', False),
+    # String IDs
+    (STR_ID, br'"[^"\\]*(?:\\.[^"\\]*)*"', False),
 
-        # HTML IDs
-        (HTML_ID, br'<[^<>]*(?:<[^<>]*>[^<>]*)*>', False),
+    # HTML IDs
+    (HTML_ID, br'<[^<>]*(?:<[^<>]*>[^<>]*)*>', False),
 
-        # Edge operators
-        (EDGE_OP, br'-[>-]', False),
-    ]
+    # Edge operators
+    (EDGE_OP, br'-[>-]', False),
+  ]
 
-    # symbol table
-    symbols = {
-        b'[': LSQUARE,
-        b']': RSQUARE,
-        b'{': LCURLY,
-        b'}': RCURLY,
-        b',': COMMA,
-        b':': COLON,
-        b';': SEMI,
-        b'=': EQUAL,
-        b'+': PLUS,
-    }
+  # symbol table
+  symbols = {
+    b'[': LSQUARE,
+    b']': RSQUARE,
+    b'{': LCURLY,
+    b'}': RCURLY,
+    b',': COMMA,
+    b':': COLON,
+    b';': SEMI,
+    b'=': EQUAL,
+    b'+': PLUS,
+  }
 
-    # literal table
-    literals = {
-        b'strict': STRICT,
-        b'graph': GRAPH,
-        b'digraph': DIGRAPH,
-        b'node': NODE,
-        b'edge': EDGE,
-        b'subgraph': SUBGRAPH,
-    }
+  # literal table
+  literals = {
+    b'strict': STRICT,
+    b'graph': GRAPH,
+    b'digraph': DIGRAPH,
+    b'node': NODE,
+    b'edge': EDGE,
+    b'subgraph': SUBGRAPH,
+  }
 
-    ignorecase = True
+  ignorecase = True
