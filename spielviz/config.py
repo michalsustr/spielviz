@@ -14,6 +14,8 @@ class UserConfig:
   def __getattr__(self, item):
     if item in self.module.__dict__:
       return self.module.__dict__[item]
+    else:
+      return None
 
 
 class NoneConfig:

@@ -20,23 +20,11 @@ CSS_FILE = get_resource_path("style.css")
 ICON_FILE = get_resource_path("game_512x512.png")
 
 
-def create_state_view(game_name: str,
-    container: Gtk.ScrolledWindow) -> StateView:
-  if is_custom_view_registed(game_name):
-    return create_custom_state_view(game_name, container)
-
-  tv = Gtk.TextView()
-  tv.set_wrap_mode(Gtk.WrapMode.WORD)
-  tv.set_left_margin(5)
-  tv.set_right_margin(5)
-  tv.set_top_margin(5)
-  tv.set_bottom_margin(5)
-  tv.set_cursor_visible(False)
-  tv.set_accepts_tab(False)
-  tv.set_editable(False)
-  tv.set_monospace(True)
-  container.add(tv)
-  return StringStateView(tv)
+def create_state_view(game: pyspiel.Game, container: Gtk.ScrolledWindow) -> StateView:
+  if is_custom_view_registed(game):
+    return create_custom_state_view(game, container)
+  else:
+    return StringStateView(game, container)
 
 
 def create_history_view(container: Gtk.ScrolledWindow) -> HistoryView:
@@ -54,7 +42,7 @@ def create_history_view(container: Gtk.ScrolledWindow) -> HistoryView:
   return HistoryView(tv)
 
 
-def GameSelector(item: Gtk.ToolItem):
+def create_game_selector(item: Gtk.ToolItem):
   game_combo = CompletingComboBoxText(
       list_games(), lambda x: "(" in x, game_parameter_populator)
   item.add(game_combo)
@@ -97,7 +85,7 @@ class MainWindow:
     self.state_history = create_history_view(
         builder.get_object("state_history"))
 
-    self.select_game = GameSelector(builder.get_object("select_game"))
+    self.select_game = create_game_selector(builder.get_object("select_game"))
     self.select_history = HistoryEntry(builder.get_object("select_history"))
     self.lookahead_spin = Spinner(builder.get_object("lookahead"),
                                   value=1, lower=1, upper=5)
@@ -120,9 +108,8 @@ class MainWindow:
 
   def set_game(self, game_name: str):
     self.game_name = game_name
-    self.state_view = create_state_view(
-        self.game_name, self.state_view_object)
     self.game = pyspiel.load_game(game_name)
+    self.state_view = create_state_view(self.game, self.state_view_object)
     self.set_state(self.game.new_initial_state())
     self.render()
 
@@ -134,6 +121,7 @@ class MainWindow:
     self.state_history.update(state)
 
   def render(self):
+    self.state_view_object.show_all()
     code = export_tree(self.state)
     self.set_dotcode(code)
 
