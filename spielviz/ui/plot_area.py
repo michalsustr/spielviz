@@ -43,11 +43,12 @@ class PlotArea:
 
   filter = 'dot'
 
-  def __init__(self, draw_area: Gtk.DrawingArea) -> None:
+  def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
     self.area = draw_area
+    self.window = window
     self.graph = Graph()
-    self.area.set_can_focus(True)
 
+    self.area.set_can_focus(True)
     self.area.connect("draw", self.on_draw)
     self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
                          Gdk.EventMask.BUTTON_RELEASE_MASK)
@@ -62,7 +63,6 @@ class PlotArea:
     self.area.connect("size-allocate", self.on_area_size_allocate)
 
     self.area.connect('key-press-event', self.on_key_press_event)
-    self.last_mtime = None
 
     self.x, self.y = 0.0, 0.0
     self.zoom_ratio = 1.0
@@ -76,7 +76,16 @@ class PlotArea:
     self.history_forward = []
 
   def error_dialog(self, message):
-    self.area.emit('error', message)
+    dialog = Gtk.MessageDialog(
+        transient_for=self.window,
+        flags=0,
+        message_type=Gtk.MessageType.ERROR,
+        buttons=Gtk.ButtonsType.CANCEL,
+        text="An error occurred:"
+    )
+    dialog.format_secondary_text(message)
+    dialog.run()
+    dialog.destroy()
 
   def set_filter(self, filter):
     self.filter = filter

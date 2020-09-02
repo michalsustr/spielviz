@@ -75,7 +75,12 @@ class MainWindow:
     builder.add_from_file(ui_file)
     builder.connect_signals(self)
 
-    self.plot_area = PlotArea(builder.get_object("plot_area"))
+    self.window = builder.get_object("window")
+    self.window.connect('delete-event', Gtk.main_quit)
+    self.window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+    self.window.set_icon_from_file(ICON_FILE)
+
+    self.plot_area = PlotArea(builder.get_object("plot_area"), self.window)
     self.state_view_container = builder.get_object("state_view")
     self.state_history_container = builder.get_object("state_history")
     self.state_history = create_history_view(self.state_history_container)
@@ -86,11 +91,6 @@ class MainWindow:
                                      value=1, lower=1, upper=5)
     self.lookbehind_spinner = Spinner(builder.get_object("lookbehind"),
                                       lower=0, upper=20)
-
-    self.window = builder.get_object("window")
-    self.window.connect('delete-event', Gtk.main_quit)
-    self.window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-    self.window.set_icon_from_file(ICON_FILE)
 
     # Apply styles.
     css_provider = Gtk.CssProvider()
