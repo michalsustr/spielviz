@@ -1,7 +1,7 @@
 import spielviz.config as cfg
 import pyspiel
 from gi.repository import Gtk, Pango
-
+from typing import List
 
 class TaggedTextView:
   """
@@ -47,6 +47,12 @@ class TaggedTextView:
 
   def append_pl(self, text: str, player: int):
     self.append(text, self.player_tag(player))
+
+  def append_player_list(self, item_per_player: List[str], join_str=", "):
+    for pl, item in enumerate(item_per_player):
+      if pl > 0:
+        self.append(join_str)
+      self.append_pl(str(item), pl)
 
   def player_tag(self, player: int):
     if player >= 0:
