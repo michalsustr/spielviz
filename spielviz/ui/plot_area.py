@@ -283,30 +283,7 @@ class PlotArea:
     if event.keyval == Gdk.KEY_q:
       Gtk.main_quit()
       return True
-    if event.keyval == Gdk.KEY_p:
-      self.on_print()
-      return True
     return False
-
-  print_settings = None
-
-  def on_print(self, action=None):
-    print_op = Gtk.PrintOperation()
-
-    if self.print_settings is not None:
-      print_op.set_print_settings(self.print_settings)
-
-    print_op.connect("begin_print", self.begin_print)
-    print_op.connect("draw_page", self.draw_page)
-
-    res = print_op.run(Gtk.PrintOperationAction.PRINT_DIALOG,
-                       self.area.get_toplevel())
-    if res == Gtk.PrintOperationResult.APPLY:
-      self.print_settings = print_op.get_print_settings()
-
-  def begin_print(self, operation, context):
-    operation.set_n_pages(1)
-    return True
 
   def draw_page(self, operation, context, page_nr):
     cr = context.get_cairo_context()
