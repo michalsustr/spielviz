@@ -57,8 +57,9 @@ class HistoryView:
     self._append("Rewards: ", self._tag_section)
     if not state.is_chance_node():
       for pl, reward in enumerate(state.rewards()):
+        if pl > 0:
+          self._append(", ")
         self._append_pl(str(reward), pl)
-      self._append(", ")
       self._appendln("")
     else:
       self._appendln("(not available)", self._tag_note)
