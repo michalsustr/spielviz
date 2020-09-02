@@ -29,22 +29,21 @@ setup(
 
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 1 - Planning',
-
-        'Environment :: X11 Applications :: GTK',
-
-        'Intended Audience :: Information Technology',
-
-        'Operating System :: OS Independent',
-
-        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
-
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3 :: Only',
-
-        'Topic :: Multimedia :: Graphics :: Viewers',
+      'Development Status :: 1 - Planning',
+      'Environment :: X11 Applications :: GTK',
+      'Intended Audience :: Information Technology',
+      'Operating System :: OS Independent',
+      'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+      'Programming Language :: Python :: 3.6',
+      'Programming Language :: Python :: 3 :: Only',
+      'Topic :: Multimedia :: Graphics :: Viewers',
     ],
 
-    # This is true, but doesn't work realiably
-    #install_requires=['gi', 'gi-cairo'],
+    install_requires=[
+      'coloredlogs',
+      'pyspiel',
+      # This is true, but doesn't work realiably
+      'gi',
+      'gi-cairo'
+    ],
 )
