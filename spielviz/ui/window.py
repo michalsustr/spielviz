@@ -3,7 +3,6 @@ import re
 
 import pyspiel
 from gi.repository import Gtk, Gdk, Gio
-from open_spiel.python.visualizations import treeviz
 
 import spielviz.config as cfg
 from spielviz.logic.game_selector import game_parameter_populator, list_games
@@ -70,15 +69,6 @@ def Spinner(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
   return spinbutton
 
 
-def export_tree_dotcode(state: pyspiel.State) -> bytes:
-  """
-  Use treeviz to export the current pyspiel.State as graphviz dot code.
-  This will be subsequently rendered in PlotArea.
-  """
-  gametree = treeviz.GameTree(state.get_game(), depth_limit=0)
-  return gametree.to_string().encode()
-
-
 class MainWindow:
   def __init__(self, ui_file=UI_FILE, css_file=CSS_FILE):
     builder = Gtk.Builder()
@@ -87,8 +77,8 @@ class MainWindow:
 
     self.plot_area = PlotArea(builder.get_object("plot_area"))
     self.state_view_container = builder.get_object("state_view")
-    self.state_history = create_history_view(
-        builder.get_object("state_history"))
+    self.state_history_container = builder.get_object("state_history")
+    self.state_history = create_history_view(self.state_history_container)
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
     self.select_history = HistoryEntry(builder.get_object("select_history"))
@@ -119,17 +109,20 @@ class MainWindow:
 
   def set_state(self, state: pyspiel.State):
     self.state = state
+    # todo: remove, just for testing:
     state.apply_action(state.legal_actions()[0])
     state.apply_action(state.legal_actions()[0])
     state.apply_action(state.legal_actions()[0])
+
     self.state_history.update(state)
     self.state_view.update(state)
+    self.plot_area.update(state)
     self.render()
 
   def render(self):
+    self.state_history_container.show_all()
     self.state_view_container.show_all()
-    code = export_tree_dotcode(self.state)
-    self.set_dotcode(code)
+    self.plot_area.show_all()
 
   def find_text(self, entry_text):
     found_items = []

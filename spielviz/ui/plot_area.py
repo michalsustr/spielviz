@@ -9,6 +9,8 @@ from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import GLib, GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
+import pyspiel
+from open_spiel.python.visualizations import treeviz
 
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
@@ -19,6 +21,15 @@ from spielviz.ui import actions, animation
 # For pygtk inspiration and guidance see:
 # - http://mirageiv.berlios.de/
 # - http://comix.sourceforge.net/
+
+def export_tree_dotcode(state: pyspiel.State) -> bytes:
+  """
+  Use treeviz to export the current pyspiel.State as graphviz dot code.
+  This will be subsequently rendered in PlotArea.
+  """
+  gametree = treeviz.GameTree(state.get_game(), depth_limit=0)
+  return gametree.to_string().encode()
+
 
 class PlotArea:
   """GTK widget that draws dot graphs."""
@@ -54,8 +65,6 @@ class PlotArea:
 
     self.area.connect('key-press-event', self.on_key_press_event)
     self.last_mtime = None
-
-    GLib.timeout_add(1000, self.update)
 
     self.x, self.y = 0.0, 0.0
     self.zoom_ratio = 1.0
@@ -101,37 +110,10 @@ class PlotArea:
       return None
     return xdotcode
 
-  def _set_dotcode(self, dotcode: bytes, filename: None = None,
-      center: bool = True) -> bool:
-    # By default DOT language is UTF-8, but it accepts other encodings
-    assert isinstance(dotcode, bytes)
-    xdotcode = self.run_filter(dotcode)
-    if xdotcode is None:
-      return False
-    try:
-      self.set_xdotcode(xdotcode, center=center)
-    except ParseError as ex:
-      self.error_dialog(str(ex))
-      return False
-    else:
-      return True
-
-  def set_dotcode(self, dotcode: bytes, filename: str = None,
-      center: bool = True) -> bool:
-    self.openfilename = None
-    if self._set_dotcode(dotcode, filename, center=center):
-      if filename is None:
-        self.last_mtime = None
-      else:
-        self.last_mtime = os.stat(filename).st_mtime
-      self.openfilename = filename
-      return True
-
   def set_xdotcode(self, xdotcode: bytes, center: bool = True) -> None:
     assert isinstance(xdotcode, bytes)
     parser = XDotParser(xdotcode)
     self.graph = parser.parse()
-    self.zoom_image(self.zoom_ratio, center=center)
 
   def reload(self) -> None:
     if self.openfilename is not None:
@@ -144,16 +126,20 @@ class PlotArea:
       else:
         del self.history_back[:], self.history_forward[:]
 
-  def update(self) -> bool:
-    if self.openfilename is not None:
-      try:
-        current_mtime = os.stat(self.openfilename).st_mtime
-      except OSError:
-        return True
-      if current_mtime != self.last_mtime:
-        self.last_mtime = current_mtime
-        self.reload()
-    return True
+  def update(self, state: pyspiel.State) -> bool:
+    dotcode = export_tree_dotcode(state)
+    assert isinstance(dotcode, bytes)
+    xdotcode = self.run_filter(dotcode)
+    if xdotcode is None:
+      return False
+    try:
+      self.set_xdotcode(xdotcode, center=True)
+    except ParseError as ex:
+      self.error_dialog(str(ex))
+      return False
+
+  def show_all(self):
+    self.zoom_image(self.zoom_ratio, center=True)
 
   def _draw_graph(self, cr: Context, rect: Rectangle) -> None:
     w, h = float(rect.width), float(rect.height)
