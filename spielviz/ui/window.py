@@ -10,7 +10,7 @@ from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.area import PlotArea
-from spielviz.ui.completing_combo_box import CompletingComboBoxText
+from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
 from spielviz.ui.history_view import HistoryView
 from spielviz.ui.state_view import StateView, StringStateView
 

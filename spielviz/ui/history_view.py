@@ -1,5 +1,5 @@
 import spielviz.config as cfg
-from spielviz.ui.tagged_view import TaggedView
+from spielviz.ui.primitives.tagged_view import TaggedView
 import pyspiel
 from gi.repository import Gtk, Pango
 
