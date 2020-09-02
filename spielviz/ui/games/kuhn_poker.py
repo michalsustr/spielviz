@@ -11,7 +11,6 @@ class KuhnStateView(StringStateView):
 
   def update(self, state: pyspiel.State):
     self._clear()
-    self._appendln(f"Kuhn Poker ({self.game.num_players()} player variant)\n")
     self._appendln(f"Player cards:", self._tag_section)
     for pl, card in enumerate([0, 1]):
       self._appendln(f"PL{pl}: {card}")  # todo: bug: cannot use colors here??
