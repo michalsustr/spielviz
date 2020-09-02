@@ -3,6 +3,12 @@ from gi.repository import Gtk
 
 
 class StateView:
+  """
+  Render current pyspiel.State within scrolled window container.
+  This allows for arbitrary rendering of UI based on the game.
+  The list of game-specific UIs is in ui/games/
+  """
+
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
     self.game = game
     self.container = container
@@ -12,6 +18,10 @@ class StateView:
 
 
 class StringStateView(StateView):
+  """
+  Render current pyspiel.State within scrolled window container
+  as a string representation of the State within a TextView.
+  """
 
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
     super().__init__(game, container)

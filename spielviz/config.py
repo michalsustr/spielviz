@@ -1,3 +1,10 @@
+"""
+There are two levels of configuration:
+
+1. Global -- defaults set in this file.
+2. User -- overrides global defaults within user's ~/.spielviz_cfg.py file.
+"""
+
 import importlib.util
 import logging
 import os

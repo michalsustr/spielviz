@@ -49,13 +49,13 @@ def create_game_selector(item: Gtk.ToolItem):
   return game_combo
 
 
-def HistoryEntry(item: Gtk.ToolItem):
+def HistoryEntry(item: Gtk.ToolItem) -> Gtk.Entry:
   entry = Gtk.Entry()
   item.add(entry)
   return entry
 
 
-def Spinner(item: Gtk.ToolItem, **kwargs):
+def Spinner(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
   spinbutton = Gtk.SpinButton()
 
   defaults = dict(
@@ -69,7 +69,11 @@ def Spinner(item: Gtk.ToolItem, **kwargs):
   return spinbutton
 
 
-def export_tree(state):
+def export_tree_dotcode(state: pyspiel.State) -> bytes:
+  """
+  Use treeviz to export the current pyspiel.State as graphviz dot code.
+  This will be subsequently rendered in PlotArea.
+  """
   gametree = treeviz.GameTree(state.get_game(), depth_limit=0)
   return gametree.to_string().encode()
 
@@ -81,16 +85,16 @@ class MainWindow:
     builder.connect_signals(self)
 
     self.world_tree = PlotArea(builder.get_object("world_tree"))
-    self.state_view_object = builder.get_object("state_view")
+    self.state_view_container = builder.get_object("state_view")
     self.state_history = create_history_view(
         builder.get_object("state_history"))
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
     self.select_history = HistoryEntry(builder.get_object("select_history"))
-    self.lookahead_spin = Spinner(builder.get_object("lookahead"),
-                                  value=1, lower=1, upper=5)
-    self.lookbehind_spin = Spinner(builder.get_object("lookbehind"),
-                                   lower=0, upper=20)
+    self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
+                                     value=1, lower=1, upper=5)
+    self.lookbehind_spinner = Spinner(builder.get_object("lookbehind"),
+                                      lower=0, upper=20)
 
     self.window = builder.get_object("window")
     self.window.connect('delete-event', Gtk.main_quit)
@@ -109,20 +113,20 @@ class MainWindow:
   def set_game(self, game_name: str):
     self.game_name = game_name
     self.game = pyspiel.load_game(game_name)
-    self.state_view = create_state_view(self.game, self.state_view_object)
+    self.state_view = create_state_view(self.game, self.state_view_container)
     self.set_state(self.game.new_initial_state())
     self.render()
 
   def set_state(self, state: pyspiel.State):
     self.state = state
     state.apply_action(state.legal_actions()[0])
-    # state.apply_action(state.legal_actions()[0])
-    # state.apply_action(state.legal_actions()[0])
+    state.apply_action(state.legal_actions()[0])
+    state.apply_action(state.legal_actions()[0])
     self.state_history.update(state)
 
   def render(self):
-    self.state_view_object.show_all()
-    code = export_tree(self.state)
+    self.state_view_container.show_all()
+    code = export_tree_dotcode(self.state)
     self.set_dotcode(code)
 
   def find_text(self, entry_text):

@@ -19,6 +19,10 @@ def player_to_str(player: int):
 
 
 class HistoryView:
+  """
+  Render information about the current pyspiel.State in a non-game-specific
+  (general) way, like the current history, player(s) to move etc.
+  """
 
   def __init__(self, container: Gtk.TextView):
     self.container = container
