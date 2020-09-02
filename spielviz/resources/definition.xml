@@ -208,15 +208,30 @@
                 <property name="width_request">350</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
+                <property name="expand">True</property>
                 <child>
                   <object class="GtkFrame">
                     <property name="shadow_type">GTK_SHADOW_IN</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="state_view">
-                        <property name="name">state_view</property>
-                        <property name="can_focus">False</property>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkLabel">
+                            <property name="label">Details</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="state_view">
+                            <property name="name">state_view</property>
+                            <property name="can_focus">False</property>
+                            <property name="expand">True</property>
+                            <property name="height_request">250</property>
+                            <!-- todo: expand state_view as first, but maximally to some height,
+                            and then state_history into whatever space remains. -->
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
@@ -226,11 +241,22 @@
                   <object class="GtkFrame">
                     <property name="shadow_type">GTK_SHADOW_IN</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="state_history">
-                        <property name="name">state_history</property>
-                        <property name="can_focus">False</property>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkLabel">
+                            <property name="label">State</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="state_history">
+                            <property name="name">state_history</property>
+                            <property name="can_focus">False</property>
+                            <property name="expand">True</property>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
