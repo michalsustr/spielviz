@@ -46,8 +46,6 @@ class PlotArea:
   def __init__(self, draw_area: Gtk.DrawingArea) -> None:
     self.area = draw_area
     self.graph = Graph()
-    self.openfilename = None
-
     self.area.set_can_focus(True)
 
     self.area.connect("draw", self.on_draw)
@@ -114,17 +112,6 @@ class PlotArea:
     assert isinstance(xdotcode, bytes)
     parser = XDotParser(xdotcode)
     self.graph = parser.parse()
-
-  def reload(self) -> None:
-    if self.openfilename is not None:
-      try:
-        fp = open(self.openfilename, 'rb')
-        self._set_dotcode(fp.read(), self.openfilename, center=False)
-        fp.close()
-      except IOError:
-        pass
-      else:
-        del self.history_back[:], self.history_forward[:]
 
   def update(self, state: pyspiel.State) -> bool:
     dotcode = export_tree_dotcode(state)
@@ -286,9 +273,6 @@ class PlotArea:
     if event.keyval == Gdk.KEY_Escape:
       self.drag_action.abort()
       self.drag_action = actions.NullAction(self)
-      return True
-    if event.keyval == Gdk.KEY_r:
-      self.reload()
       return True
     if event.keyval == Gdk.KEY_f:
       win = widget.self.area.get_toplevel()
