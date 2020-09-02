@@ -126,7 +126,7 @@ class PlotArea:
       return False
 
   def show_all(self):
-    self.zoom_image(self.zoom_ratio, center=True)
+    self.area.queue_draw()
 
   def _draw_graph(self, cr: Context, rect: Rectangle) -> None:
     w, h = float(rect.width), float(rect.height)
