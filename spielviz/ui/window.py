@@ -20,7 +20,8 @@ CSS_FILE = get_resource_path("style.css")
 ICON_FILE = get_resource_path("game_512x512.png")
 
 
-def create_state_view(game: pyspiel.Game, container: Gtk.ScrolledWindow) -> StateView:
+def create_state_view(game: pyspiel.Game,
+    container: Gtk.ScrolledWindow) -> StateView:
   if is_custom_view_registed(game):
     return create_custom_state_view(game, container)
   else:
@@ -115,7 +116,6 @@ class MainWindow:
     self.game = pyspiel.load_game(game_name)
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.set_state(self.game.new_initial_state())
-    self.render()
 
   def set_state(self, state: pyspiel.State):
     self.state = state
@@ -123,6 +123,8 @@ class MainWindow:
     state.apply_action(state.legal_actions()[0])
     state.apply_action(state.legal_actions()[0])
     self.state_history.update(state)
+    self.state_view.update(state)
+    self.render()
 
   def render(self):
     self.state_view_container.show_all()
