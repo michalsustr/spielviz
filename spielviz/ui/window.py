@@ -80,7 +80,7 @@ class MainWindow:
     self.window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
     self.window.set_icon_from_file(ICON_FILE)
 
-    self.plot_area = PlotArea(builder.get_object("plot_area"), self.window)
+    self.plot_area = PlotArea(builder.get_object("plot_area"), self)
     self.state_view_container = builder.get_object("state_view")
     self.state_history_container = builder.get_object("state_history")
     self.state_history = create_history_view(self.state_history_container)
@@ -202,3 +202,16 @@ class MainWindow:
     pass
     # self.action_back.set_sensitive(has_back)
     # self.action_forward.set_sensitive(has_forward)
+
+  def error_dialog(self, message):
+    dialog = Gtk.MessageDialog(
+        transient_for=self.window,
+        flags=0,
+        message_type=Gtk.MessageType.ERROR,
+        buttons=Gtk.ButtonsType.CANCEL,
+        text="An error occurred:"
+    )
+    dialog.format_secondary_text(message)
+    dialog.run()
+    dialog.destroy()
+

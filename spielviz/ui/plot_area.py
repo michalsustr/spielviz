@@ -75,18 +75,6 @@ class PlotArea:
     self.history_back = []
     self.history_forward = []
 
-  def error_dialog(self, message):
-    dialog = Gtk.MessageDialog(
-        transient_for=self.window,
-        flags=0,
-        message_type=Gtk.MessageType.ERROR,
-        buttons=Gtk.ButtonsType.CANCEL,
-        text="An error occurred:"
-    )
-    dialog.format_secondary_text(message)
-    dialog.run()
-    dialog.destroy()
-
   def set_filter(self, filter):
     self.filter = filter
 
@@ -113,7 +101,7 @@ class PlotArea:
     if error:
       sys.stderr.write(error + '\n')
     if p.returncode != 0:
-      self.error_dialog(error)
+      self.window.error_dialog(error)
       return None
     return xdotcode
 
@@ -131,7 +119,7 @@ class PlotArea:
     try:
       self.set_xdotcode(xdotcode, center=True)
     except ParseError as ex:
-      self.error_dialog(str(ex))
+      self.window.error_dialog(str(ex))
       return False
 
   def show_all(self):
