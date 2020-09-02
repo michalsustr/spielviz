@@ -9,7 +9,7 @@ import spielviz.config as cfg
 from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
-from spielviz.ui.area import PlotArea
+from spielviz.ui.plot_area import PlotArea
 from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
 from spielviz.ui.history_view import HistoryView
 from spielviz.ui.state_view import StateView, StringStateView
@@ -85,7 +85,7 @@ class MainWindow:
     builder.add_from_file(ui_file)
     builder.connect_signals(self)
 
-    self.world_tree = PlotArea(builder.get_object("world_tree"))
+    self.plot_area = PlotArea(builder.get_object("plot_area"))
     self.state_view_container = builder.get_object("state_view")
     self.state_history = create_history_view(
         builder.get_object("state_history"))
@@ -133,7 +133,7 @@ class MainWindow:
 
   def find_text(self, entry_text):
     found_items = []
-    dot_widget = self.world_tree
+    dot_widget = self.plot_area
     regexp = re.compile(entry_text)
     for element in dot_widget.graph.nodes + dot_widget.graph.edges:
       if element.search_text(regexp):
@@ -142,7 +142,7 @@ class MainWindow:
 
   def textentry_changed(self, widget, entry):
     entry_text = entry.get_text()
-    dot_widget = self.world_tree
+    dot_widget = self.plot_area
     if not entry_text:
       dot_widget.set_highlight(None, search=True)
       return
@@ -152,7 +152,7 @@ class MainWindow:
 
   def textentry_activate(self, widget, entry):
     entry_text = entry.get_text()
-    dot_widget = self.world_tree
+    dot_widget = self.plot_area
     if not entry_text:
       dot_widget.set_highlight(None, search=True)
       return
@@ -163,17 +163,17 @@ class MainWindow:
       dot_widget.animate_to(found_items[0].x, found_items[0].y)
 
   def set_filter(self, filter):
-    self.world_tree.set_filter(filter)
+    self.plot_area.set_filter(filter)
 
   def set_dotcode(self, dotcode, filename=None):
-    if self.world_tree.set_dotcode(dotcode, filename):
+    if self.plot_area.set_dotcode(dotcode, filename):
       self.update_title(filename)
-      self.world_tree.zoom_to_fit()
+      self.plot_area.zoom_to_fit()
 
   def set_xdotcode(self, xdotcode, filename=None):
-    if self.world_tree.set_xdotcode(xdotcode):
+    if self.plot_area.set_xdotcode(xdotcode):
       self.update_title(filename)
-      self.world_tree.zoom_to_fit()
+      self.plot_area.zoom_to_fit()
 
   def update_title(self, filename=None):
     if filename is None:
@@ -194,7 +194,7 @@ class MainWindow:
     pass
 
   def on_reload(self, action):
-    self.world_tree.reload()
+    self.plot_area.reload()
 
   def error_dialog(self, message):
     dlg = Gtk.MessageDialog(parent=self,

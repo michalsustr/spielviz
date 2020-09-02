@@ -266,8 +266,8 @@
             </child>
 
             <child>
-              <object class="GtkDrawingArea" id="world_tree">
-                <property name="name">world_tree</property>
+              <object class="GtkDrawingArea" id="plot_area">
+                <property name="name">plot_area</property>
                 <property name="can_focus">False</property>
               </object>
             </child>

@@ -76,8 +76,9 @@ class HistoryView:
         and cfg.SHOW_ACTION_OBSERVATION_HISTORY:
       for player in range(game.num_players()):
         self.ttv.appendln("")
-        self.ttv.appendln(f"Action-Observation history ({player_to_str(player)}):",
-                          self.ttv.TAG_SECTION, self.ttv.TAG_PLAYER[player])
+        self.ttv.appendln(
+          f"Action-Observation history ({player_to_str(player)}):",
+          self.ttv.TAG_SECTION, self.ttv.TAG_PLAYER[player])
         aoh = pyspiel.ActionObservationHistory(player, state)
         for act_or_obs in aoh.history():
           self.ttv.appendln(str(act_or_obs))
