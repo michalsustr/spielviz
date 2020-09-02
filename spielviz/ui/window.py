@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 
 import pyspiel
 from gi.repository import Gtk, Gdk, Gio
@@ -189,29 +190,40 @@ class MainWindow:
   def on_reload(self, action):
     self.plot_area.reload()
 
-  def error_dialog(self, message):
-    dlg = Gtk.MessageDialog(parent=self,
-                            type=Gtk.MessageType.ERROR,
-                            message_format=message,
-                            buttons=Gtk.ButtonsType.OK)
-    dlg.set_title(BASE_TITLE)
-    dlg.run()
-    dlg.destroy()
-
   def on_history(self, action, has_back, has_forward):
     pass
     # self.action_back.set_sensitive(has_back)
     # self.action_forward.set_sensitive(has_forward)
 
-  def error_dialog(self, message):
+  def error_dialog(self, message: str):
+    """
+    Show an error dialog.
+    """
+    logging.error(message)
     dialog = Gtk.MessageDialog(
         transient_for=self.window,
-        flags=0,
         message_type=Gtk.MessageType.ERROR,
-        buttons=Gtk.ButtonsType.CANCEL,
+        buttons=Gtk.ButtonsType.OK,
         text="An error occurred:"
     )
     dialog.format_secondary_text(message)
     dialog.run()
     dialog.destroy()
+
+  def warning_dialog(self, message: str) -> bool:
+    """
+    Show a warning dialog and ask whether to continue.
+    :return: Did user press OK?
+    """
+    logging.warning(message)
+    dialog = Gtk.MessageDialog(
+        transient_for=self.window,
+        message_type=Gtk.MessageType.WARNING,
+        buttons=Gtk.ButtonsType.OK_CANCEL,
+        text="WARNING",
+    )
+    dialog.format_secondary_text(message)
+    response = dialog.run()
+    dialog.destroy()
+    return response == Gtk.ResponseType.OK
 
