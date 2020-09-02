@@ -1,6 +1,6 @@
 import pyspiel
 from gi.repository import Gtk
-from spielviz.ui.primitives.tagged_view import TaggedView
+from spielviz.ui.primitives.tagged_view import TaggedTextView
 
 
 class StateView:
@@ -37,8 +37,8 @@ class StringStateView(StateView):
     text_view.set_editable(False)
     text_view.set_monospace(True)
     container.add(text_view)
-    self.tv = TaggedView(text_view)
+    self.ttv = TaggedTextView(text_view)
 
   def update(self, state: pyspiel.State):
-    self.tv._clear()
-    self.tv._append(str(state))
+    self.ttv.clear_text()
+    self.ttv.append(str(state))

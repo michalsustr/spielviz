@@ -1,5 +1,5 @@
 import spielviz.config as cfg
-from spielviz.ui.primitives.tagged_view import TaggedView
+from spielviz.ui.primitives.tagged_view import TaggedTextView
 import pyspiel
 from gi.repository import Gtk, Pango
 
@@ -26,61 +26,61 @@ class HistoryView:
   """
 
   def __init__(self, container: Gtk.TextView):
-    self.tv = TaggedView(container)
+    self.ttv = TaggedTextView(container)
 
   def update(self, state: pyspiel.State):
-    self.tv._clear()
+    self.ttv.clear_text()
     game = state.get_game()
 
-    self.tv._appendln("History: ", self.tv._tag_section)
-    self.tv._appendln(",".join(str(action) for action in state.history()))
+    self.ttv.appendln("History: ", self.ttv.TAG_SECTION)
+    self.ttv.appendln(",".join(str(action) for action in state.history()))
 
-    self.tv._append("Current player: ", self.tv._tag_section)
+    self.ttv.append("Current player: ", self.ttv.TAG_SECTION)
     current_player = state.current_player()
-    self.tv._appendln_pl(player_to_str(current_player), current_player)
+    self.ttv.appendln_pl(player_to_str(current_player), current_player)
 
-    self.tv._append("Rewards: ", self.tv._tag_section)
+    self.ttv.append("Rewards: ", self.ttv.TAG_SECTION)
     if not state.is_chance_node():
       for pl, reward in enumerate(state.rewards()):
         if pl > 0:
-          self.tv._append(", ")
-        self.tv._append_pl(str(reward), pl)
-      self.tv._appendln("")
+          self.ttv.append(", ")
+        self.ttv.append_pl(str(reward), pl)
+      self.ttv.appendln("")
     else:
-      self.tv._appendln("(not available)", self.tv._tag_note)
+      self.ttv.appendln("(not available)", self.ttv.TAG_NOTE)
 
     if cfg.SHOW_ACTIONS:
-      self.tv._appendln("")
-      self.tv._appendln("Actions:", self.tv._tag_section)
+      self.ttv.appendln("")
+      self.ttv.appendln("Actions:", self.ttv.TAG_SECTION)
       rollout = game.new_initial_state()
       for action in state.history():
-        self.tv._appendln_pl(rollout.action_to_string(action),
-                          rollout.current_player())
+        self.ttv.appendln_pl(rollout.action_to_string(action),
+                             rollout.current_player())
         rollout.apply_action(action)
 
     if game.get_type().provides_information_state_string \
         and cfg.SHOW_INFORMATION_STATE_STRING:
-      self.tv._appendln("")
-      self.tv._appendln("Information state:", self.tv._tag_section)
+      self.ttv.appendln("")
+      self.ttv.appendln("Information state:", self.ttv.TAG_SECTION)
       if current_player >= 0:
-        self.tv._appendln(state.information_state_string())
+        self.ttv.appendln(state.information_state_string())
       else:
-        self.tv._appendln("(not available)", self.tv._tag_note)
+        self.ttv.appendln("(not available)", self.ttv.TAG_NOTE)
 
     if game.get_type().provides_factored_observation_string \
         and cfg.SHOW_PUBLIC_OBSERVATION_HISTORY:
-      self.tv._appendln("")
-      self.tv._appendln("Public-Observation history:", self.tv._tag_section)
+      self.ttv.appendln("")
+      self.ttv.appendln("Public-Observation history:", self.ttv.TAG_SECTION)
       poh = pyspiel.PublicObservationHistory(state)
       for observation in poh.history():
-        self.tv._appendln(observation)
+        self.ttv.appendln(observation)
 
     if game.get_type().provides_observation_string \
         and cfg.SHOW_ACTION_OBSERVATION_HISTORY:
       for player in range(game.num_players()):
-        self.tv._appendln("")
-        self.tv._appendln(f"Action-Observation history ({player_to_str(player)}):",
-                       self.tv._tag_section, self.tv._tag_player[player])
+        self.ttv.appendln("")
+        self.ttv.appendln(f"Action-Observation history ({player_to_str(player)}):",
+                          self.ttv.TAG_SECTION, self.ttv.TAG_PLAYER[player])
         aoh = pyspiel.ActionObservationHistory(player, state)
         for act_or_obs in aoh.history():
-          self.tv._appendln(str(act_or_obs))
+          self.ttv.appendln(str(act_or_obs))

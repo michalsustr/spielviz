@@ -3,7 +3,7 @@ import pyspiel
 from gi.repository import Gtk, Pango
 
 
-class TaggedView:
+class TaggedTextView:
   """
   An object that allows to tag text in game-specific way within
   a TextView container.
@@ -15,52 +15,52 @@ class TaggedView:
     self.textbuffer.set_text("")
     self.container.set_buffer(self.textbuffer)
 
-    self._tag_note = self.textbuffer.create_tag(
+    self.TAG_NOTE = self.textbuffer.create_tag(
         "n", foreground="#999999")
-    self._tag_section = self.textbuffer.create_tag(
+    self.TAG_SECTION = self.textbuffer.create_tag(
         "b", weight=Pango.Weight.BOLD)
-    self._tag_player = [
+    self.TAG_PLAYER = [
       self.textbuffer.create_tag(f"p{p}", foreground=color)
       for p, color in enumerate(cfg.PLAYER_COLORS)
     ]
-    self._tag_invalid = self.textbuffer.create_tag(
+    self.TAG_INVALID = self.textbuffer.create_tag(
         "inv", foreground=cfg.INVALID_PLAYER_COLOR)
-    self._tag_terminal = self.textbuffer.create_tag(
+    self.TAG_TERMINAL = self.textbuffer.create_tag(
         "ter", foreground=cfg.TERMINAL_COLOR)
-    self._tag_chance = self.textbuffer.create_tag(
+    self.TAG_CHANCE = self.textbuffer.create_tag(
         "chn", foreground=cfg.CHANCE_COLOR)
-    self._tag_simultaneous = self.textbuffer.create_tag(
+    self.TAG_SIMULTANEOUS = self.textbuffer.create_tag(
         "sim", foreground=cfg.SIMULTANEOUS_PLAYER_COLOR)
 
-  def _append(self, text: str, *tags):
+  def append(self, text: str, *tags):
     if tags:
       self.textbuffer.insert_with_tags(
           self.textbuffer.get_end_iter(), text, *tags)
     else:
       self.textbuffer.insert(self.textbuffer.get_end_iter(), text)
 
-  def _appendln(self, text: str, *tags):
-    self._append(text + "\n", *tags)
+  def appendln(self, text: str, *tags):
+    self.append(text + "\n", *tags)
 
-  def _appendln_pl(self, text: str, player: int):
-    self._appendln(text, self._player_tag(player))
+  def appendln_pl(self, text: str, player: int):
+    self.appendln(text, self.player_tag(player))
 
-  def _append_pl(self, text: str, player: int):
-    self._append(text, self._player_tag(player))
+  def append_pl(self, text: str, player: int):
+    self.append(text, self.player_tag(player))
 
-  def _player_tag(self, player: int):
+  def player_tag(self, player: int):
     if player >= 0:
-      return self._tag_player[player]
+      return self.TAG_PLAYER[player]
     elif player == pyspiel.PlayerId.INVALID:
-      return self._tag_invalid
+      return self.TAG_INVALID
     elif player == pyspiel.PlayerId.TERMINAL:
-      return self._tag_terminal
+      return self.TAG_TERMINAL
     elif player == pyspiel.PlayerId.CHANCE:
-      return self._tag_chance
+      return self.TAG_CHANCE
     elif player == pyspiel.PlayerId.SIMULTANEOUS:
-      return self._tag_simultaneous
+      return self.TAG_SIMULTANEOUS
     else:
       raise AttributeError(f"Player not found: {player}")
 
-  def _clear(self):
+  def clear_text(self):
     self.textbuffer.set_text("")
