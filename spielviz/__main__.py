@@ -3,6 +3,7 @@
 import argparse
 import logging
 import sys
+import coloredlogs
 
 import gi
 
@@ -46,7 +47,7 @@ def main():
 
   options = parser.parse_args()
 
-  logging.getLogger().setLevel(cfg.LOGGING_LEVEL)
+  coloredlogs.install(level=cfg.LOGGING_LEVEL)
 
   win = MainWindow()
   win.set_filter(options.layout)
