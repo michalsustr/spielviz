@@ -1,5 +1,6 @@
 import pyspiel
 from gi.repository import Gtk
+from spielviz.ui.primitives.tagged_view import TaggedView
 
 
 class StateView:
@@ -11,20 +12,20 @@ class StateView:
 
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
     self.game = game
-    self.container = container
+    # self.container = container
 
   def update(self, state: pyspiel.State):
     raise NotImplementedError
 
 
-class StringStateView(StateView):
+class StringStateView(StateView, TaggedView):
   """
   Render current pyspiel.State within scrolled window container
   as a string representation of the State within a TextView.
   """
 
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
-    super().__init__(game, container)
+    StateView.__init__(self, game, container)
 
     tv = Gtk.TextView()
     tv.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -38,9 +39,8 @@ class StringStateView(StateView):
     tv.set_monospace(True)
     container.add(tv)
 
-    self.text_buffer = Gtk.TextBuffer()
-    self.text_buffer.set_text(game.get_type().short_name)
-    tv.set_buffer(self.text_buffer)
+    TaggedView.__init__(self, tv)
 
   def update(self, state: pyspiel.State):
-    self.text_buffer.set_text(str(state))
+    self._clear()
+    self._append(str(state))
