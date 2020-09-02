@@ -10,7 +10,7 @@ class KuhnStateView(StringStateView):
     assert game.get_type().short_name == "kuhn_poker"
 
   def update(self, state: pyspiel.State):
-    self._clear()
-    self._appendln(f"Player cards:", self._tag_section)
+    self.tv._clear()
+    self.tv._appendln(f"Player cards:", self.tv._tag_section)
     for pl, card in enumerate([0, 1]):
-      self._appendln(f"PL{pl}: {card}")  # todo: bug: cannot use colors here??
+      self.tv._appendln(f"PL{pl}: {card}")  # todo: bug: cannot use colors here??
