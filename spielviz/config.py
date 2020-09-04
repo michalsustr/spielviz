@@ -52,7 +52,7 @@ user_cfg = load_config("~/.spielviz_cfg.py")
 
 DEFAULT_GAME = user_cfg.DEFAULT_GAME or "kuhn_poker"
 LAYOUT = user_cfg.LAYOUT or "dot"
-LOGGING_LEVEL = user_cfg.LOGGING_LEVEL or logging.INFO
+LOGGING_LEVEL = user_cfg.LOGGING_LEVEL or logging.DEBUG
 
 # Colors
 INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
