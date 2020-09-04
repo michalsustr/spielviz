@@ -87,6 +87,8 @@ class MainWindow:
     self.state_history = create_history_view(self.state_history_container)
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
+    # todo: create custom signal for completing combo box
+    self.select_game.get_child().connect("activate", self.update_game)
     self.select_history = HistoryEntry(builder.get_object("select_history"))
     self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
                                      value=1, lower=1, upper=5)
@@ -102,19 +104,22 @@ class MainWindow:
 
     self.window.show_all()
 
-  def set_game(self, game_name: str):
-    self.game_name = game_name
-    self.game = pyspiel.load_game(game_name)
+  def update_game(self, entry):
+    # Get the current content of the entry
+    game_name = entry.get_text()
+    try:
+      game = pyspiel.load_game(game_name)
+      self.set_game(game)
+    except pyspiel.SpielException:
+      self.error_dialog(f"Could not load '{game_name}'")
+
+  def set_game(self, game: pyspiel.Game):
+    self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.set_state(self.game.new_initial_state())
 
   def set_state(self, state: pyspiel.State):
     self.state = state
-    # todo: remove, just for testing:
-    state.apply_action(state.legal_actions()[0])
-    state.apply_action(state.legal_actions()[0])
-    state.apply_action(state.legal_actions()[0])
-
     self.state_history.update(state)
     self.state_view.update(state)
     self.plot_area.update(state)
