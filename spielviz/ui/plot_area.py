@@ -287,7 +287,7 @@ class PlotArea:
     rect = self.area.get_allocation()
     self._draw_graph(cr, rect)
 
-  def get_drag_action(self, event: EventButton) -> Type[actions.PanAction]:
+  def get_drag_action(self, event: EventButton) -> Type[actions.DragAction]:
     state = event.state
     if event.button in (1, 2):  # left or middle button
       modifiers = Gtk.accelerator_get_default_mod_mask()
