@@ -116,11 +116,13 @@ class MainWindow:
       self.error_dialog(f"Could not load '{game_name}'")
 
   def set_game(self, game: pyspiel.Game):
+    logging.debug(f"Setting game '{str(game)}'")
     self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.set_state(self.game.new_initial_state())
 
   def set_state(self, state: pyspiel.State):
+    logging.debug(f"Setting state '{str(state)}'")
     self.state = state
     self.state_history.update(state)
     self.state_view.update(state)
