@@ -102,6 +102,8 @@ class MainWindow:
         Gdk.Screen.get_default(), css_provider,
         Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+    if cfg.WINDOW_MAXIMIZE:
+      self.window.maximize()
     self.window.show_all()
 
   def update_game(self, entry):

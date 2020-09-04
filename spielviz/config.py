@@ -54,6 +54,9 @@ DEFAULT_GAME = user_cfg.DEFAULT_GAME or "kuhn_poker"
 LAYOUT = user_cfg.LAYOUT or "dot"
 LOGGING_LEVEL = user_cfg.LOGGING_LEVEL or logging.DEBUG
 
+# Window
+WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or True
+
 # Colors
 INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
 CHANCE_COLOR = user_cfg.CHANCE_COLOR or "#800080"  # purple
