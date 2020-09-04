@@ -51,7 +51,7 @@ def main():
 
   win = MainWindow()
   win.set_filter(options.layout)
-  win.set_game(options.game)
+  win.set_game_from_name(options.game)
 
   if sys.platform != 'win32':
     # Reset KeyboardInterrupt SIGINT handler,

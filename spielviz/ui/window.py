@@ -105,8 +105,10 @@ class MainWindow:
     self.window.show_all()
 
   def update_game(self, entry):
-    # Get the current content of the entry
     game_name = entry.get_text()
+    self.set_game_from_name(game_name)
+
+  def set_game_from_name(self, game_name):
     try:
       game = pyspiel.load_game(game_name)
       self.set_game(game)
