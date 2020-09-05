@@ -54,10 +54,23 @@ DEFAULT_GAME = user_cfg.DEFAULT_GAME or "kuhn_poker"
 LAYOUT = user_cfg.LAYOUT or "dot"
 LOGGING_LEVEL = user_cfg.LOGGING_LEVEL or logging.DEBUG
 
-# Window
+# [Window]
 WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or True
 
-# Colors
+# [Rendering]
+
+# Available filters (same as in `man dot`):
+# dot       - drawing directed graphs (default)
+# neato     - drawing undirected graphs
+# twopi     - radial layouts of graphs
+# circo     - circular layout of graphs
+# fdp       - drawing undirected graphs
+# sfdp      - drawing large undirected graphs
+# patchwork - squarified tree maps
+# osage     - array-based layouts
+GRAPHVIZ_FILTER = user_cfg.GRAPHVIZ_FILTER or "dot"
+
+# [Colors]
 INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
 CHANCE_COLOR = user_cfg.CHANCE_COLOR or "#800080"  # purple
 TERMINAL_COLOR = user_cfg.TERMINAL_COLOR or "#000000"  # black
@@ -80,7 +93,7 @@ PLAYER_COLORS = user_cfg.PLAYER_COLORS or [
   # just add more colors here.
 ]
 
-# Show options
+# [Show options]
 SHOW_ACTIONS = user_cfg.SHOW_ACTIONS or True
 SHOW_INFORMATION_STATE_STRING = user_cfg.SHOW_INFORMATION_STATE_STRING or True
 SHOW_PUBLIC_OBSERVATION_HISTORY = user_cfg.SHOW_PUBLIC_OBSERVATION_HISTORY or True
