@@ -66,7 +66,7 @@ class PlotArea:
 
     self.x, self.y = 0.0, 0.0
     self.zoom_ratio = 1.0
-    self.zoom_to_fit_on_resize = False
+    self.zoom_to_fit_on_resize = True
     self.animation = animation.NoAnimation(self)
     self.drag_action = actions.NullAction(self)
     self.presstime = None
