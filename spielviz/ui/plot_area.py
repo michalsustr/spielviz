@@ -13,18 +13,8 @@ import pyspiel
 
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
-from spielviz.logic.game_tree import GameTreeViz
 from spielviz.graphics.elements import Graph, Node, Element
 from spielviz.ui import actions, animation
-
-
-def export_tree_dotcode(state: pyspiel.State) -> bytes:
-  """
-  Use treeviz to export the current pyspiel.State as graphviz dot code.
-  This will be subsequently rendered in PlotArea.
-  """
-  gametree = GameTreeViz(state.get_game(), depth_limit=0)
-  return gametree.to_string().encode()
 
 
 class PlotArea:
@@ -36,8 +26,6 @@ class PlotArea:
     'error': (GObject.SIGNAL_RUN_LAST, None, (str,)),
     'history': (GObject.SIGNAL_RUN_LAST, None, (bool, bool))
   }
-
-  filter = 'dot'
 
   def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
     self.area = draw_area
@@ -71,52 +59,8 @@ class PlotArea:
     self.history_back = []
     self.history_forward = []
 
-  def set_filter(self, filter):
-    self.filter = filter
-
-  def run_filter(self, dotcode: bytes) -> bytes:
-    if not self.filter:
-      return dotcode
-    try:
-      p = subprocess.Popen(
-          [self.filter, '-Txdot'],
-          stdin=subprocess.PIPE,
-          stdout=subprocess.PIPE,
-          stderr=subprocess.PIPE,
-          shell=False,
-          universal_newlines=False
-      )
-    except OSError as exc:
-      error = '%s: %s' % (self.filter, exc.strerror)
-      p = subprocess.CalledProcessError(exc.errno, self.filter,
-                                        exc.strerror)
-    else:
-      xdotcode, error = p.communicate(dotcode)
-      error = error.decode()
-    error = error.rstrip()
-    if error:
-      sys.stderr.write(error + '\n')
-    if p.returncode != 0:
-      self.window.error_dialog(error)
-      return None
-    return xdotcode
-
-  def set_xdotcode(self, xdotcode: bytes, center: bool = True) -> None:
-    assert isinstance(xdotcode, bytes)
-    parser = XDotParser(xdotcode)
-    self.graph = parser.parse()
-
-  def update(self, state: pyspiel.State) -> bool:
-    dotcode = export_tree_dotcode(state)
-    assert isinstance(dotcode, bytes)
-    xdotcode = self.run_filter(dotcode)
-    if xdotcode is None:
-      return False
-    try:
-      self.set_xdotcode(xdotcode, center=True)
-    except ParseError as ex:
-      self.window.error_dialog(str(ex))
-      return False
+  def set_graph(self, graph: Graph) -> None:
+    self.graph = graph
 
   def show_all(self):
     self.area.queue_draw()

@@ -1,7 +1,9 @@
 import colorsys
+import subprocess
 import sys
 from typing import Dict, List, Tuple, Union
 
+import spielviz.config as cfg
 from spielviz.dot.lexer import DotLexer, Token, ParseError
 from spielviz.graphics import elements, shape
 from spielviz.graphics.pen import Pen
@@ -551,3 +553,26 @@ class XDotParser(DotParser):
     x = (x + self.xoffset) * self.xscale
     y = (y + self.yoffset) * self.yscale
     return x, y
+
+
+def make_xdotcode(dotcode: bytes, filter: str = cfg.GRAPHVIZ_FILTER) -> bytes:
+  """
+  Run filter to get graph with a layout to display.
+
+  May raise an exception of failure.
+
+  Filter options are the ones available from `man dot`.
+  :return: xdot layout.
+  """
+  p = subprocess.Popen([filter, '-Txdot'],
+                       stdin=subprocess.PIPE,
+                       stdout=subprocess.PIPE,
+                       shell=False,
+                       universal_newlines=False)
+  xdotcode, _ = p.communicate(dotcode)
+  return xdotcode
+
+
+def make_graph(xdotcode: bytes) -> elements.Graph:
+  parser = XDotParser(xdotcode)
+  return parser.parse()
