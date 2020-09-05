@@ -10,24 +10,20 @@ from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import GLib, GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
 import pyspiel
-from open_spiel.python.visualizations import treeviz
 
 from spielviz.dot.lexer import ParseError
 from spielviz.dot.parser import XDotParser
+from spielviz.logic.game_tree import GameTreeViz
 from spielviz.graphics.elements import Graph, Node, Element
 from spielviz.ui import actions, animation
 
-
-# For pygtk inspiration and guidance see:
-# - http://mirageiv.berlios.de/
-# - http://comix.sourceforge.net/
 
 def export_tree_dotcode(state: pyspiel.State) -> bytes:
   """
   Use treeviz to export the current pyspiel.State as graphviz dot code.
   This will be subsequently rendered in PlotArea.
   """
-  gametree = treeviz.GameTree(state.get_game(), depth_limit=0)
+  gametree = GameTreeViz(state.get_game(), depth_limit=0)
   return gametree.to_string().encode()
 
 
@@ -45,7 +41,7 @@ class PlotArea:
 
   def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
     self.area = draw_area
-    self.window = window
+    self.window = window  # MainWindow, no type signature because of cyclic ref.
     self.graph = Graph()
 
     self.area.set_can_focus(True)
