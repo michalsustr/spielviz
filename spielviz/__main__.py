@@ -35,22 +35,13 @@ def main():
       description="SpielViz is an interactive viewer for OpenSpiel games",
       formatter_class=argparse.RawDescriptionHelpFormatter,
       epilog=usage_tips)
-  parser.add_argument(
-      'game', nargs="?", default=cfg.DEFAULT_GAME,
-      help='game to view '
-           '[default: %(default)s]')
-  parser.add_argument(
-      '-l', '--layout', choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
-      dest='layout', default=cfg.LAYOUT, metavar='LAYOUT',
-      help='graphviz layout: dot, neato, twopi, circo, or fdp '
-           '[default: %(default)s]')
-
+  parser.add_argument('game', nargs="?", default=cfg.DEFAULT_GAME,
+                      help='game to view [default: %(default)s]')
   options = parser.parse_args()
 
   coloredlogs.install(level=cfg.LOGGING_LEVEL)
 
   win = MainWindow()
-  win.set_filter(options.layout)
   win.set_game_from_name(options.game)
 
   if sys.platform != 'win32':
