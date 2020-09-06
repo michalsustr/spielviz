@@ -100,6 +100,7 @@
                   </object>
                 </child>
 
+                <!--
                 <child>
                   <object class="GtkToolItem">
                     <property name="margin">3</property>
@@ -194,6 +195,7 @@
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
+                -->
               </object>
             </child>
           </object>
