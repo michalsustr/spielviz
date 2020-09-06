@@ -106,7 +106,7 @@ class MainWindow:
 
     self.lookbehind = 1
     self.lookbehind_spinner = create_spin_button(
-        builder.get_object("lookbehind"), lower=self.lookbehind, upper=20)
+        builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
     # Apply styles.

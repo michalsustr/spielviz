@@ -213,7 +213,7 @@ class GameTreeViz(pygraphviz.AGraph):
     if state.is_terminal():
       self._terminal_nodes.append(state_str)
       return
-    if depth > lookahead >= 0:
+    if depth >= lookahead >= 0:
       return
 
     for action in state.legal_actions():
