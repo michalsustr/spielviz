@@ -9,8 +9,8 @@ from gi.repository import Gtk, Gdk, Gio, GObject
 import spielviz.config as cfg
 from spielviz.dot.parser import make_graph, make_xdotcode
 from spielviz.logic.game_selector import game_parameter_populator, list_games
-from spielviz.logic.game_tree import GameTreeViz
-from spielviz.logic.state_history import state_from_history
+from spielviz.logic.dotcode_tree import export_tree_dotcode
+from spielviz.logic.state_history import state_from_history_str
 from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.plot_area import PlotArea
@@ -75,15 +75,6 @@ def Spinner(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
   return spinbutton
 
 
-def export_tree_dotcode(state: pyspiel.State) -> bytes:
-  """
-  Use treeviz to export the current pyspiel.State as graphviz dot code.
-  This will be subsequently rendered in PlotArea.
-  """
-  gametree = GameTreeViz(state, depth_limit=1)
-  return gametree.to_string().encode()
-
-
 class MainWindow:
   def __init__(self, ui_file=UI_FILE, css_file=CSS_FILE):
     builder = Gtk.Builder()
@@ -125,7 +116,7 @@ class MainWindow:
 
   def change_history(self, origin_object: GObject, history_str: str):
     try:
-      state = state_from_history(self.game, history_str)
+      state = state_from_history_str(self.game, history_str)
       self.set_state(state)
     except ValueError as e:
       self.error_dialog(f"Could not parse history string '{history_str}': {e}")

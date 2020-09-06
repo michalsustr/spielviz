@@ -34,6 +34,7 @@ from __future__ import print_function
 
 import collections
 import pyspiel
+from spielviz.logic.state_history import state_from_history
 
 # pylint: disable=g-import-not-at-top
 try:
@@ -112,28 +113,12 @@ def default_edge_decorator(parent, unused_child, action):
 
 
 class GameTreeViz(pygraphviz.AGraph):
-  """Builds `pygraphviz.AGraph` of the game tree.
-
-  Attributes:
-    game: A `pyspiel.Game` object.
-    depth_limit: Maximum depth of the tree. Optional, default=-1 (no limit).
-    node_decorator: Decorator function for nodes (states). Optional, default=
-      `treeviz.default_node_decorator`.
-    edge_decorator: Decorator function for edges (actions). Optional, default=
-      `treeviz.default_edge_decorator`.
-    group_terminal: Whether to display all terminal states at same level,
-      default=False.
-    group_infosets: Whether to group infosets together, default=False.
-    group_pubsets: Whether to group public sets together, default=False.
-    target_pubset: Whether to group all public sets "*" or a specific one.
-    infoset_attrs: Attributes to style infoset grouping.
-    pubset_attrs: Attributes to style public set grouping.
-    kwargs: Keyword arguments passed on to `pygraphviz.AGraph.__init__`.
-  """
+  """Builds `pygraphviz.AGraph` of the game tree."""
 
   def __init__(self,
-      root=None,
-      depth_limit=-1,
+      state=None,
+      lookahead=1,
+      lookbehind=1,
       node_decorator=default_node_decorator,
       edge_decorator=default_edge_decorator,
       group_terminal=False,
@@ -149,8 +134,11 @@ class GameTreeViz(pygraphviz.AGraph):
 
     # We use pygraphviz.AGraph.add_subgraph to cluster nodes, and it requires a
     # default constructor. Thus game needs to be optional.
-    if root is None:
+    if state is None:
       return
+
+    assert lookbehind >= 0
+    assert lookahead >= 0
 
     self._node_decorator = node_decorator
     self._edge_decorator = edge_decorator
@@ -162,8 +150,15 @@ class GameTreeViz(pygraphviz.AGraph):
     self._pubsets = collections.defaultdict(lambda: [])
     self._terminal_nodes = []
 
-    self.add_node(self.state_to_str(root), **self._node_decorator(root))
-    self._build_tree(root, 0, depth_limit)
+    self.add_node(self.state_to_str(state), **self._node_decorator(state))
+
+    if lookbehind:
+      start_from = state_from_history(
+          state.get_game(), state.history()[:-lookbehind])
+      self.add_node(self.state_to_str(start_from),
+                    **self._node_decorator(start_from))
+      self._build_lookbehind(start_from, state)
+    self._build_lookahead(state, 0, lookahead)
 
     for (player, info_state), sibblings in self._infosets.items():
       cluster_name = "cluster_{}_{}".format(player, info_state)
@@ -196,14 +191,29 @@ class GameTreeViz(pygraphviz.AGraph):
     # AGraph nodes can't have empty string == None as a key, thus we prepend " "
     return " " + state.history_str()
 
-  def _build_tree(self, state, depth, depth_limit):
+  def _build_lookbehind(self, start_from_state, arrive_to_state):
+    if start_from_state.history() == arrive_to_state.history():
+      return
+
+    state_str = self.state_to_str(start_from_state)
+    for action in start_from_state.legal_actions():
+      child = start_from_state.child(action)
+      child_str = self.state_to_str(child)
+      self.add_node(child_str, **self._node_decorator(child))
+      self.add_edge(state_str, child_str,
+                    **self._edge_decorator(start_from_state, child, action))
+
+      if arrive_to_state.history()[len(start_from_state.history())] == action:
+        self._build_lookbehind(child, arrive_to_state)
+
+  def _build_lookahead(self, state, depth, lookahead):
     """Recursively builds the game tree."""
     state_str = self.state_to_str(state)
 
     if state.is_terminal():
       self._terminal_nodes.append(state_str)
       return
-    if depth > depth_limit >= 0:
+    if depth > lookahead >= 0:
       return
 
     for action in state.legal_actions():
@@ -223,10 +233,19 @@ class GameTreeViz(pygraphviz.AGraph):
         pub_obs_history = str(pyspiel.PublicObservationHistory(child))
         self._pubsets[pub_obs_history].append(child_str)
 
-      self._build_tree(child, depth + 1, depth_limit)
+      self._build_lookahead(child, depth + 1, lookahead)
 
   def _repr_svg_(self):
     """Allows to render directly in Jupyter notebooks and Google Colab."""
     if not self.has_layout:
       self.layout(prog="dot")
     return self.draw(format="svg").decode(self.encoding)
+
+
+def export_tree_dotcode(state: pyspiel.State, **kwargs) -> bytes:
+  """
+  Use treeviz to export the current pyspiel.State as graphviz dotcode.
+  This will be subsequently rendered in PlotArea.
+  """
+  gametree = GameTreeViz(state, **kwargs)
+  return gametree.to_string().encode()

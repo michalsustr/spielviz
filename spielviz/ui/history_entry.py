@@ -1,7 +1,7 @@
 import logging
 
 import pyspiel
-from spielviz.logic.state_history import state_from_history
+from spielviz.logic.state_history import state_from_history_str
 from gi.repository import Gtk
 
 
@@ -35,7 +35,7 @@ class HistoryEntry(Gtk.Entry):
     # Add possibly more options based on current expansion:
     try:
       history_str = self.get_text().rstrip()
-      rollout = state_from_history(self.state.get_game(), history_str)
+      rollout = state_from_history_str(self.state.get_game(), history_str)
       for action in rollout.legal_actions():
         self.liststore.append((history_str + " " + str(action),))
     except RuntimeError as e:
