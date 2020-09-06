@@ -118,6 +118,7 @@ class MainWindow:
 
     if cfg.WINDOW_MAXIMIZE:
       self.window.maximize()
+    self.window.set_title(BASE_TITLE)
     self.window.show_all()
 
   def update_lookahead(self, button: Gtk.SpinButton):
@@ -148,7 +149,8 @@ class MainWindow:
       self.error_dialog(f"Could not load '{game_name}'")
 
   def set_game(self, game: pyspiel.Game):
-    logging.debug(f"Setting game '{str(game)}'")
+    logging.debug(f"Setting game '{game}'")
+    self.window.set_title(f"{BASE_TITLE}: {game}")
     self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.set_state(self.game.new_initial_state())
@@ -212,13 +214,6 @@ class MainWindow:
     dot_widget.set_highlight(found_items, search=True)
     if (len(found_items) == 1):
       dot_widget.animate_to(found_items[0].x, found_items[0].y)
-
-  def update_title(self, filename=None):
-    if filename is None:
-      self.window.set_title(BASE_TITLE)
-    else:
-      self.window.set_title(
-          os.path.basename(filename) + ' - ' + BASE_TITLE)
 
   def on_reload(self, action):
     self.plot_area.reload()
