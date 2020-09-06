@@ -1,6 +1,7 @@
 import logging
 
 import pyspiel
+from spielviz.logic.state_history import state_from_history
 from gi.repository import Gtk
 
 

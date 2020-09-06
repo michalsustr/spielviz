@@ -10,6 +10,7 @@ import spielviz.config as cfg
 from spielviz.dot.parser import make_graph, make_xdotcode
 from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.game_tree import GameTreeViz
+from spielviz.logic.state_history import state_from_history
 from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.plot_area import PlotArea
@@ -81,16 +82,6 @@ def export_tree_dotcode(state: pyspiel.State) -> bytes:
   """
   gametree = GameTreeViz(state, depth_limit=1)
   return gametree.to_string().encode()
-
-
-def state_from_history(game: pyspiel.Game, history_str: str) -> pyspiel.State:
-  rollout = game.new_initial_state()
-  history_str = history_str.strip()
-  if history_str:
-    for action in re.split("[\s,;]+", history_str):
-      if action:
-        rollout.apply_action(int(action))
-  return rollout
 
 
 class MainWindow:
