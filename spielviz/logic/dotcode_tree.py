@@ -1,56 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""Visualizing game trees with graphviz.
-
-GameTree builds a `pygraphviz.AGraph` reprensentation of the game tree. The
-resulting tree can be directly visualized in Jupyter notebooks or Google Colab
-via SVG plotting - or written to a file by calling `draw(filename, prog="dot")`.
-
-See `examples/treeviz_example.py` for a more detailed example.
-
-This module relies on external dependencies, which need to be installed before
-use. On a debian system follow these steps:
-```
-sudo apt-get install graphviz libgraphviz-dev
-pip install pygraphviz
-```
-"""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
+
+import pygraphviz
 import pyspiel
+
 import spielviz.config as cfg
 from spielviz.logic.state_history import state_from_history
-
-# pylint: disable=g-import-not-at-top
-try:
-  import pygraphviz
-except (ImportError, Exception) as e:
-  raise ImportError(
-      str(e) + "\nPlease make sure to install the following dependencies:\n"
-               "sudo apt-get install graphviz libgraphviz-dev\n"
-               "pip install pygraphviz")
-# pylint: enable=g-import-not-at-top
-
-_FONTSIZE = 8
-_WIDTH = _HEIGHT = 0.25
-_ARROWSIZE = .5
-_MARGIN = 0.01
 
 
 class GameTreeViz(pygraphviz.AGraph):
@@ -58,14 +12,10 @@ class GameTreeViz(pygraphviz.AGraph):
 
   def __init__(self,
       state=None,
-      lookahead=1,
-      lookbehind=1,
-      group_terminal=False,
-      group_infosets=False,
-      group_pubsets=False,
+      lookahead=1, lookbehind=1,
+      group_terminal=False, group_infosets=False, group_pubsets=False,
       target_pubset="*",
-      infoset_attrs=None,
-      pubset_attrs=None,
+      infoset_attrs=None, pubset_attrs=None,
       **kwargs):
 
     kwargs["directed"] = kwargs.get("directed", True)
@@ -86,7 +36,8 @@ class GameTreeViz(pygraphviz.AGraph):
     self._pubsets = collections.defaultdict(lambda: [])
     self._terminal_nodes = []
 
-    self.add_node(self.state_to_str(state), **self._node_decorator(state))
+    self.add_node(self.state_to_str(state),
+                  **self._node_decorator(state, highlight_node=True))
 
     if lookbehind:
       start_from = state_from_history(
@@ -115,31 +66,28 @@ class GameTreeViz(pygraphviz.AGraph):
       self.add_subgraph(self._terminal_nodes, rank="same")
 
   def state_to_str(self, state):
-    """Unique string representation of a state.
-
-    Args:
-      state: The state.
-
-    Returns:
-      String representation of state.
-    """
     assert not state.is_simultaneous_node()
     # AGraph nodes can't have empty string == None as a key, thus we prepend " "
     return " " + state.history_str()
 
   def _build_lookbehind(self, start_from_state, arrive_to_state):
-    if start_from_state.history() == arrive_to_state.history():
+    start_hist = start_from_state.history()
+    arrive_hist = arrive_to_state.history()
+    if start_hist == arrive_hist:
       return
 
     state_str = self.state_to_str(start_from_state)
     for action in start_from_state.legal_actions():
       child = start_from_state.child(action)
       child_str = self.state_to_str(child)
-      self.add_node(child_str, **self._node_decorator(child))
-      self.add_edge(state_str, child_str,
-                    **self._edge_decorator(start_from_state, child, action))
 
-      if arrive_to_state.history()[len(start_from_state.history())] == action:
+      lies_on_trajectory = arrive_hist[len(start_hist)] == action
+
+      self.add_node(child_str, **self._node_decorator(child))
+      self.add_edge(state_str, child_str, **self._edge_decorator(
+          start_from_state, child, action, highlight_edge=lies_on_trajectory))
+
+      if lies_on_trajectory:
         self._build_lookbehind(child, arrive_to_state)
 
   def _build_lookahead(self, state, depth, lookahead):
@@ -156,8 +104,7 @@ class GameTreeViz(pygraphviz.AGraph):
       child = state.child(action)
       child_str = self.state_to_str(child)
       self.add_node(child_str, **self._node_decorator(child))
-      self.add_edge(state_str, child_str,
-                    **self._edge_decorator(state, child, action))
+      self.add_edge(state_str, child_str, **self._edge_decorator(state, action))
 
       if self._group_infosets and not child.is_chance_node() \
           and not child.is_terminal():
@@ -171,64 +118,44 @@ class GameTreeViz(pygraphviz.AGraph):
 
       self._build_lookahead(child, depth + 1, lookahead)
 
-  
-  def _node_decorator(self, state):
-    """Decorates a state-node of the game tree.
-  
-    This method can be called by a custom decorator to prepopulate the attributes
-    dictionary. Then only relevant attributes need to be changed, or added.
-  
-    Args:
-      state: The state.
-  
-    Returns:
-      `dict` with graphviz node style attributes.
-    """
+  def _node_decorator(self, state, highlight_node=False):
     player = state.current_player()
     attrs = {
       "label": "",
-      "fontsize": _FONTSIZE,
-      "width": _WIDTH,
-      "height": _HEIGHT,
-      "margin": _MARGIN
+      "fontsize": cfg.PLOT_FONTSIZE,
+      "width": cfg.PLOT_WIDTH,
+      "height": cfg.PLOT_HEIGHT,
+      "margin": cfg.PLOT_MARGIN
     }
+
     if state.is_terminal():
       attrs["label"] = ", ".join(map(str, state.returns()))
       attrs["shape"] = "diamond"
       attrs["color"] = cfg.TERMINAL_COLOR
     elif state.is_chance_node():
       attrs["shape"] = "circle"
-      attrs["width"] = _WIDTH / 2.
-      attrs["height"] = _HEIGHT / 2.
+      attrs["width"] = cfg.PLOT_WIDTH / 2.
+      attrs["height"] = cfg.PLOT_HEIGHT / 2.
       attrs["color"] = cfg.CHANCE_COLOR
     else:
       attrs["label"] = str(state.information_state_string())
       attrs["shape"] = cfg.PLAYER_SHAPES.get(player, "square")
       attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
+
+    if highlight_node:
+      attrs["penwidth"] = cfg.PLOT_HIGHLIGHT_PENWIDTH
     return attrs
-  
-  
-  def _edge_decorator(self, parent, unused_child, action):
-    """Decorates a state-node of the game tree.
-  
-    This method can be called by a custom decorator to prepopulate the attributes
-    dictionary. Then only relevant attributes need to be changed, or added.
-  
-    Args:
-      parent: The parent state.
-      unused_child: The child state, not used in the default decorator.
-      action: `int` the selected action in the parent state.
-  
-    Returns:
-      `dict` with graphviz node style attributes.
-    """
+
+  def _edge_decorator(self, parent, action, highlight_edge=False):
     player = parent.current_player()
     attrs = {
       "label": " " + parent.action_to_string(player, action),
-      "fontsize": _FONTSIZE,
-      "arrowsize": _ARROWSIZE
+      "fontsize": cfg.PLOT_FONTSIZE,
+      "arrowsize": cfg.PLOT_ARROWSIZE,
     }
     attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
+    if highlight_edge:
+      attrs["penwidth"] = cfg.PLOT_HIGHLIGHT_PENWIDTH
     return attrs
 
 

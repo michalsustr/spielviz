@@ -69,6 +69,11 @@ WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or False
 # patchwork - squarified tree maps
 # osage     - array-based layouts
 GRAPHVIZ_FILTER = user_cfg.GRAPHVIZ_FILTER or "dot"
+PLOT_FONTSIZE = 8
+PLOT_WIDTH = PLOT_HEIGHT = 0.25
+PLOT_ARROWSIZE = .5
+PLOT_MARGIN = 0.01
+PLOT_HIGHLIGHT_PENWIDTH = 2.5
 
 # [Players]
 INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
