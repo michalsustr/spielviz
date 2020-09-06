@@ -1,3 +1,5 @@
+These instructions are incomplete. Feel free to update them 
+
 Requirements
 ============
 
@@ -6,6 +8,9 @@ Requirements
  * [PyGObject bindings for GTK3](https://pygobject.readthedocs.io)
 
  * [Graphviz](http://www.graphviz.org/Download.php)
+ 
+ * [OpenSpiel](https://github.com/deepmind/open_spiel/) -- only nightly version
+   from source code is supported now.
 
 Windows users
 -------------
