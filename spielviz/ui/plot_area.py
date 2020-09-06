@@ -62,6 +62,7 @@ class PlotArea(GObject.GObject):
     self.graph = graph
 
   def show_all(self):
+    self.zoom_to_fit()
     self.area.queue_draw()
 
   def _draw_graph(self, cr: Context, rect: Rectangle) -> None:
@@ -280,12 +281,12 @@ class PlotArea(GObject.GObject):
       if self.on_click(el, event):
         return True
 
-      if event.button == 1:
-        jump = self.get_jump(x, y)
-        if jump is not None:
-          self.animate_to(jump.x, jump.y)
-
-        return True
+      # if event.button == 1:
+      #   jump = self.get_jump(x, y)
+      #   if jump is not None:
+      #     self.animate_to(jump.x, jump.y)
+      #
+      #   return True
 
     if event.button == 1 or event.button == 2:
       return True
