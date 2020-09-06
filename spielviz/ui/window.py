@@ -111,7 +111,7 @@ class MainWindow:
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
     # todo: create custom signal for completing combo box
-    self.select_game.get_child().connect("activate", self.update_game)
+    self.select_game.connect("activate", self.update_game)
     self.select_history = HistoryEntry(builder.get_object("select_history"))
     self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
                                      value=1, lower=1, upper=5)
@@ -138,8 +138,7 @@ class MainWindow:
     except pyspiel.SpielError as e:
       self.error_dialog(f"Could not seek to history '{history_str}': {e}")
 
-  def update_game(self, entry):
-    game_name = entry.get_text()
+  def update_game(self, combo_box: CompletingComboBoxText, game_name: str):
     self.set_game_from_name(game_name)
 
   def set_game_from_name(self, game_name):

@@ -1,9 +1,13 @@
 from typing import List, Callable
 
-import gi.repository.Gtk as Gtk
+from gi.repository import GLib, GObject, Gdk, Gtk
 
 
 class CompletingComboBoxText(Gtk.ComboBoxText):
+  __gsignals__ = {
+    'activate': (GObject.SIGNAL_RUN_LAST, None, (str,))
+  }
+
   def __init__(self, static_options: List[str],
       dynamic_condition: Callable[[str], bool],
       dynamic_populator: Callable[[str], List[str]], **kwargs):
@@ -40,13 +44,13 @@ class CompletingComboBoxText(Gtk.ComboBoxText):
 
     # Connect a listener to adjust the model when the user types something
     entry.connect("changed", self.update_completion, True)
-    entry.connect("changed", self.update_completion, True)
+    entry.connect("activate", self.emit_entry_activate, True)
+
+  def emit_entry_activate(self, entry, editable):
+    self.emit("activate", entry.get_text())
 
   def update_completion(self, entry, editable):
-    # Get the current content of the entry
     text = entry.get_text()
-
-    # Get the completion which needs to be updated
     completion = entry.get_completion()
 
     long_enough = len(text) >= completion.get_minimum_key_length()
