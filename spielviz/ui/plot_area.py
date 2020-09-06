@@ -20,11 +20,7 @@ from spielviz.ui import actions, animation
 class PlotArea(GObject.GObject):
   """GTK widget that draws dot graphs."""
 
-  # TODO GTK3: Second argument has to be of type Gdk.EventButton instead of object.
   __gsignals__ = {
-    'clicked': (GObject.SIGNAL_RUN_LAST, None, (str, object)),
-    'error': (GObject.SIGNAL_RUN_LAST, None, (str,)),
-    'history': (GObject.SIGNAL_RUN_LAST, None, (bool, bool)),
     'change_history': (GObject.SIGNAL_RUN_LAST, None, (str,))
   }
 
@@ -59,8 +55,8 @@ class PlotArea(GObject.GObject):
     self.presstime = None
     self.highlight = None
     self.highlight_search = False
-    self.history_back = []
-    self.history_forward = []
+    self.gui_history_back = []
+    self.gui_history_forward = []
 
   def set_graph(self, graph: Graph) -> None:
     self.graph = graph
@@ -315,16 +311,16 @@ class PlotArea(GObject.GObject):
       self.zoom_to_fit()
 
   def animate_to(self, x, y):
-    del self.history_forward[:]
-    self.history_back.append(self.get_current_pos())
-    self.history_changed()
+    del self.gui_history_forward[:]
+    self.gui_history_back.append(self.get_current_pos())
+    self.gui_history_changed()
     self._animate_to(x, y)
 
   def _animate_to(self, x, y):
     self.animation = animation.ZoomToAnimation(self, x, y)
     self.animation.start()
 
-  def history_changed(self):
+  def gui_history_changed(self):
     # self.area.get_allocation(
     #       'history',
     #       bool(self.history_back),
@@ -333,20 +329,20 @@ class PlotArea(GObject.GObject):
 
   def on_go_back(self, action=None):
     try:
-      item = self.history_back.pop()
+      item = self.gui_history_back.pop()
     except LookupError:
       return
-    self.history_forward.append(self.get_current_pos())
-    self.history_changed()
+    self.gui_history_forward.append(self.get_current_pos())
+    self.gui_history_changed()
     self._animate_to(*item)
 
   def on_go_forward(self, action=None):
     try:
-      item = self.history_forward.pop()
+      item = self.gui_history_forward.pop()
     except LookupError:
       return
-    self.history_back.append(self.get_current_pos())
-    self.history_changed()
+    self.gui_history_back.append(self.get_current_pos())
+    self.gui_history_changed()
     self._animate_to(*item)
 
   def window2graph(self, x: int, y: int) -> Tuple[float, float]:
