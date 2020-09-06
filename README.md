@@ -12,6 +12,12 @@ factor and tree lookahead (like Go).
 
 ![Screenshot of SpielViz on the game of kuhn_poker(players=4)](screenshot.png)
 
+Run as:
+```
+pip install -e .
+python -m spielviz
+```
+
 TODOs
 =====
 
