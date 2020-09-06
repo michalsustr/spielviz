@@ -34,6 +34,7 @@ from __future__ import print_function
 
 import collections
 import pyspiel
+import spielviz.config as cfg
 from spielviz.logic.state_history import state_from_history
 
 # pylint: disable=g-import-not-at-top
@@ -46,70 +47,10 @@ except (ImportError, Exception) as e:
                "pip install pygraphviz")
 # pylint: enable=g-import-not-at-top
 
-_PLAYER_SHAPES = {0: "square", 1: "ellipse"}
-_PLAYER_COLORS = {-1: "black", 0: "blue", 1: "red"}
 _FONTSIZE = 8
 _WIDTH = _HEIGHT = 0.25
 _ARROWSIZE = .5
 _MARGIN = 0.01
-
-
-def default_node_decorator(state):
-  """Decorates a state-node of the game tree.
-
-  This method can be called by a custom decorator to prepopulate the attributes
-  dictionary. Then only relevant attributes need to be changed, or added.
-
-  Args:
-    state: The state.
-
-  Returns:
-    `dict` with graphviz node style attributes.
-  """
-  player = state.current_player()
-  attrs = {
-    "label": "",
-    "fontsize": _FONTSIZE,
-    "width": _WIDTH,
-    "height": _HEIGHT,
-    "margin": _MARGIN
-  }
-  if state.is_terminal():
-    attrs["label"] = ", ".join(map(str, state.returns()))
-    attrs["shape"] = "diamond"
-  elif state.is_chance_node():
-    attrs["shape"] = "point"
-    attrs["width"] = _WIDTH / 2.
-    attrs["height"] = _HEIGHT / 2.
-  else:
-    attrs["label"] = str(state.information_state_string())
-    attrs["shape"] = _PLAYER_SHAPES.get(player, "ellipse")
-    attrs["color"] = _PLAYER_COLORS.get(player, "black")
-  return attrs
-
-
-def default_edge_decorator(parent, unused_child, action):
-  """Decorates a state-node of the game tree.
-
-  This method can be called by a custom decorator to prepopulate the attributes
-  dictionary. Then only relevant attributes need to be changed, or added.
-
-  Args:
-    parent: The parent state.
-    unused_child: The child state, not used in the default decorator.
-    action: `int` the selected action in the parent state.
-
-  Returns:
-    `dict` with graphviz node style attributes.
-  """
-  player = parent.current_player()
-  attrs = {
-    "label": " " + parent.action_to_string(player, action),
-    "fontsize": _FONTSIZE,
-    "arrowsize": _ARROWSIZE
-  }
-  attrs["color"] = _PLAYER_COLORS.get(player, "black")
-  return attrs
 
 
 class GameTreeViz(pygraphviz.AGraph):
@@ -119,8 +60,6 @@ class GameTreeViz(pygraphviz.AGraph):
       state=None,
       lookahead=1,
       lookbehind=1,
-      node_decorator=default_node_decorator,
-      edge_decorator=default_edge_decorator,
       group_terminal=False,
       group_infosets=False,
       group_pubsets=False,
@@ -139,9 +78,6 @@ class GameTreeViz(pygraphviz.AGraph):
 
     assert lookbehind >= 0
     assert lookahead >= 0
-
-    self._node_decorator = node_decorator
-    self._edge_decorator = edge_decorator
 
     self._group_infosets = group_infosets
     self._group_pubsets = group_pubsets
@@ -235,11 +171,65 @@ class GameTreeViz(pygraphviz.AGraph):
 
       self._build_lookahead(child, depth + 1, lookahead)
 
-  def _repr_svg_(self):
-    """Allows to render directly in Jupyter notebooks and Google Colab."""
-    if not self.has_layout:
-      self.layout(prog="dot")
-    return self.draw(format="svg").decode(self.encoding)
+  
+  def _node_decorator(self, state):
+    """Decorates a state-node of the game tree.
+  
+    This method can be called by a custom decorator to prepopulate the attributes
+    dictionary. Then only relevant attributes need to be changed, or added.
+  
+    Args:
+      state: The state.
+  
+    Returns:
+      `dict` with graphviz node style attributes.
+    """
+    player = state.current_player()
+    attrs = {
+      "label": "",
+      "fontsize": _FONTSIZE,
+      "width": _WIDTH,
+      "height": _HEIGHT,
+      "margin": _MARGIN
+    }
+    if state.is_terminal():
+      attrs["label"] = ", ".join(map(str, state.returns()))
+      attrs["shape"] = "diamond"
+      attrs["color"] = cfg.TERMINAL_COLOR
+    elif state.is_chance_node():
+      attrs["shape"] = "circle"
+      attrs["width"] = _WIDTH / 2.
+      attrs["height"] = _HEIGHT / 2.
+      attrs["color"] = cfg.CHANCE_COLOR
+    else:
+      attrs["label"] = str(state.information_state_string())
+      attrs["shape"] = cfg.PLAYER_SHAPES.get(player, "square")
+      attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
+    return attrs
+  
+  
+  def _edge_decorator(self, parent, unused_child, action):
+    """Decorates a state-node of the game tree.
+  
+    This method can be called by a custom decorator to prepopulate the attributes
+    dictionary. Then only relevant attributes need to be changed, or added.
+  
+    Args:
+      parent: The parent state.
+      unused_child: The child state, not used in the default decorator.
+      action: `int` the selected action in the parent state.
+  
+    Returns:
+      `dict` with graphviz node style attributes.
+    """
+    player = parent.current_player()
+    attrs = {
+      "label": " " + parent.action_to_string(player, action),
+      "fontsize": _FONTSIZE,
+      "arrowsize": _ARROWSIZE
+    }
+    attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
+    return attrs
 
 
 def export_tree_dotcode(state: pyspiel.State, **kwargs) -> bytes:

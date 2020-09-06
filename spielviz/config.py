@@ -55,7 +55,7 @@ LAYOUT = user_cfg.LAYOUT or "dot"
 LOGGING_LEVEL = user_cfg.LOGGING_LEVEL or logging.DEBUG
 
 # [Window]
-WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or True
+WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or False
 
 # [Rendering]
 
@@ -70,28 +70,32 @@ WINDOW_MAXIMIZE = user_cfg.WINDOW_MAXIMIZE or True
 # osage     - array-based layouts
 GRAPHVIZ_FILTER = user_cfg.GRAPHVIZ_FILTER or "dot"
 
-# [Colors]
+# [Players]
 INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
 CHANCE_COLOR = user_cfg.CHANCE_COLOR or "#800080"  # purple
 TERMINAL_COLOR = user_cfg.TERMINAL_COLOR or "#000000"  # black
 SIMULTANEOUS_PLAYER_COLOR = user_cfg.SIMULTANEOUS_PLAYER_COLOR or "#F0FFFF"  # azure
-PLAYER_COLORS = user_cfg.PLAYER_COLORS or [
-  "#FF0000",  # red
-  "#0000FF",  # blue
-  "#008000",  # green
-  "#800000",  # maroon
-  "#FF00FF",  # fuchsia
-  "#00FF00",  # lime
-  "#FFFF00",  # yellow
-  "#00FFFF",  # aqua
-  "#808000",  # olive
-  "#000080",  # navy
-  "#008080",  # teal
-  "#00008B",  # darkblue
+PLAYER_COLORS = user_cfg.PLAYER_COLORS or {
+  0: "#FF0000",  # red
+  1: "#0000FF",  # blue
+  2: "#008000",  # green
+  3: "#800000",  # maroon
+  4: "#FF00FF",  # fuchsia
+  5: "#00FF00",  # lime
+  6: "#FFFF00",  # yellow
+  7: "#00FFFF",  # aqua
+  8: "#808000",  # olive
+  9: "#000080",  # navy
+  10: "#008080",  # teal
+  11: "#00008B",  # darkblue
 
   # If you need to support more players for your game,
   # just add more colors here.
-]
+}
+PLAYER_SHAPES = user_cfg.PLAYER_COLORS or {
+  0: "square",
+  1: "square"
+}
 
 # [Show options]
 SHOW_ACTIONS = user_cfg.SHOW_ACTIONS or True

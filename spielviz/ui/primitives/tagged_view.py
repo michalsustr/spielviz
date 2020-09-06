@@ -21,7 +21,7 @@ class TaggedTextView:
         "b", weight=Pango.Weight.BOLD)
     self.TAG_PLAYER = [
       self.textbuffer.create_tag(f"p{p}", foreground=color)
-      for p, color in enumerate(cfg.PLAYER_COLORS)
+      for p, color in cfg.PLAYER_COLORS.items()
     ]
     self.TAG_INVALID = self.textbuffer.create_tag(
         "inv", foreground=cfg.INVALID_PLAYER_COLOR)
