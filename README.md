@@ -32,7 +32,7 @@ I will be working on this project probably very sporadically.
  * [ ] Show mapping to public / private trees.
  * [ ] Create a CLI interface that jumps to specific positions in games.
  * [ ] Add a GUI history.
- * [ ] Add a game transformation to OpenSpiel that acts as an action 
+ * [ ] Add a game transformation to OpenSpiel that acts as an action 
        factorization so that we can show games with large branching factor 
        nicely. 
  * [ ] Add game parameter autocompletion.
