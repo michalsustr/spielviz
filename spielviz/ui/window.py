@@ -15,6 +15,7 @@ from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.plot_area import PlotArea
 from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
 from spielviz.ui.history_view import HistoryView
+from spielviz.ui.history_entry import HistoryEntry
 from spielviz.ui.state_view import StateView, StringStateView
 
 BASE_TITLE = 'SpielViz'
@@ -53,10 +54,10 @@ def create_game_selector(item: Gtk.ToolItem):
   return game_combo
 
 
-def HistoryEntry(item: Gtk.ToolItem) -> Gtk.Entry:
-  entry = Gtk.Entry()
-  item.add(entry)
-  return entry
+def create_history_entry(item: Gtk.ToolItem) -> HistoryEntry:
+  history_entry = HistoryEntry()
+  item.add(history_entry)
+  return history_entry
 
 
 def Spinner(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
@@ -111,7 +112,8 @@ class MainWindow:
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
     self.select_game.connect("activate", self.update_game)
-    self.select_history = HistoryEntry(builder.get_object("select_history"))
+    self.select_history = create_history_entry(
+        builder.get_object("select_history"))
     self.select_history.connect(
         "activate", lambda entry: self.change_history(entry, entry.get_text()))
     self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
@@ -165,7 +167,13 @@ class MainWindow:
 
       self.state_history.update(state)
       self.state_view.update(state)
-      self.select_history.set_text(state.history_str())
+      self.select_history.update(state)
+      # set_text(state.history_str())
+      # completion_model = self.select_history.get_completion().get_model()
+      # completion_model.clear()
+      # for i in range(100):
+      #   completion_model.append((str(i),))
+
       self.state = state
       self.render()
     except pyspiel.SpielError as ex:
