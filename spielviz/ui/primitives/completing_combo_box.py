@@ -47,6 +47,7 @@ class CompletingComboBoxText(Gtk.ComboBoxText):
     entry.connect("activate", self.emit_entry_activate, True)
 
   def emit_entry_activate(self, entry, editable):
+    # todo: call activate also on popup menu selection.
     self.emit("activate", entry.get_text())
 
   def update_completion(self, entry, editable):

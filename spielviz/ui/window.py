@@ -4,7 +4,7 @@ import logging
 from typing import List
 
 import pyspiel
-from gi.repository import Gtk, Gdk, Gio
+from gi.repository import Gtk, Gdk, Gio, GObject
 
 import spielviz.config as cfg
 from spielviz.dot.parser import make_graph, make_xdotcode
@@ -110,9 +110,10 @@ class MainWindow:
     self.state_history = create_history_view(self.state_history_container)
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
-    # todo: create custom signal for completing combo box
     self.select_game.connect("activate", self.update_game)
     self.select_history = HistoryEntry(builder.get_object("select_history"))
+    self.select_history.connect(
+        "activate", lambda entry: self.change_history(entry, entry.get_text()))
     self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
                                      value=1, lower=1, upper=5)
     self.lookbehind_spinner = Spinner(builder.get_object("lookbehind"),
@@ -129,7 +130,7 @@ class MainWindow:
       self.window.maximize()
     self.window.show_all()
 
-  def change_history(self, plot_area: PlotArea, history_str: str):
+  def change_history(self, origin_object: GObject, history_str: str):
     try:
       state = state_from_history(self.game, history_str)
       self.set_state(state)
@@ -164,6 +165,7 @@ class MainWindow:
 
       self.state_history.update(state)
       self.state_view.update(state)
+      self.select_history.set_text(state.history_str())
       self.state = state
       self.render()
     except pyspiel.SpielError as ex:
