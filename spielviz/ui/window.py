@@ -99,12 +99,12 @@ class MainWindow:
     self.select_history.connect(
         "activate", lambda entry: self.change_history(entry, entry.get_text()))
 
-    self.lookahead = 1
+    self.lookahead = cfg.LOOKAHEAD
     self.lookahead_spinner = create_spin_button(
         builder.get_object("lookahead"), value=self.lookahead, lower=1, upper=5)
     self.lookahead_spinner.connect("value-changed", self.update_lookahead)
 
-    self.lookbehind = 1
+    self.lookbehind = cfg.LOOKBEHIND
     self.lookbehind_spinner = create_spin_button(
         builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
