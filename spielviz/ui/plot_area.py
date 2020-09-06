@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 import time
-from typing import Optional, Set, Tuple, Type
+from typing import List, Optional, Set, Tuple, Type
 
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
@@ -17,17 +17,20 @@ from spielviz.graphics.elements import Graph, Node, Element
 from spielviz.ui import actions, animation
 
 
-class PlotArea:
+class PlotArea(GObject.GObject):
   """GTK widget that draws dot graphs."""
 
   # TODO GTK3: Second argument has to be of type Gdk.EventButton instead of object.
   __gsignals__ = {
     'clicked': (GObject.SIGNAL_RUN_LAST, None, (str, object)),
     'error': (GObject.SIGNAL_RUN_LAST, None, (str,)),
-    'history': (GObject.SIGNAL_RUN_LAST, None, (bool, bool))
+    'history': (GObject.SIGNAL_RUN_LAST, None, (bool, bool)),
+    'change_history': (GObject.SIGNAL_RUN_LAST, None, (str,))
   }
 
   def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
+    GObject.GObject.__init__(self)
+
     self.area = draw_area
     self.window = window  # MainWindow, no type signature because of cyclic ref.
     self.graph = Graph()
@@ -267,6 +270,9 @@ class PlotArea:
     """Override this method in subclass to process
     click events. Note that element can be None
     (click on empty space)."""
+    if isinstance(element, Node):
+      history_str = element.id.decode().strip()
+      self.emit("change_history", history_str)
     return False
 
   def on_area_button_release(self, area, event: EventButton) -> bool:

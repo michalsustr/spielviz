@@ -132,7 +132,7 @@ class GameTreeViz(pygraphviz.AGraph):
   """
 
   def __init__(self,
-      game=None,
+      root=None,
       depth_limit=-1,
       node_decorator=default_node_decorator,
       edge_decorator=default_edge_decorator,
@@ -149,31 +149,19 @@ class GameTreeViz(pygraphviz.AGraph):
 
     # We use pygraphviz.AGraph.add_subgraph to cluster nodes, and it requires a
     # default constructor. Thus game needs to be optional.
-    if game is None:
+    if root is None:
       return
 
-    self.game = game
     self._node_decorator = node_decorator
     self._edge_decorator = edge_decorator
 
     self._group_infosets = group_infosets
     self._group_pubsets = group_pubsets
-    if self._group_infosets:
-      if not self.game.get_type().provides_information_state_string:
-        raise RuntimeError(
-            "Grouping of infosets requested, but the game does not "
-            "provide information state string.")
-    if self._group_pubsets:
-      if not self.game.get_type().provides_factored_observation_string:
-        raise RuntimeError(
-            "Grouping of public sets requested, but the game does not "
-            "provide factored observations strings.")
 
     self._infosets = collections.defaultdict(lambda: [])
     self._pubsets = collections.defaultdict(lambda: [])
     self._terminal_nodes = []
 
-    root = game.new_initial_state()
     self.add_node(self.state_to_str(root), **self._node_decorator(root))
     self._build_tree(root, 0, depth_limit)
 

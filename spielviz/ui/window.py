@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+from typing import List
 
 import pyspiel
 from gi.repository import Gtk, Gdk, Gio
@@ -77,9 +78,18 @@ def export_tree_dotcode(state: pyspiel.State) -> bytes:
   Use treeviz to export the current pyspiel.State as graphviz dot code.
   This will be subsequently rendered in PlotArea.
   """
-  gametree = GameTreeViz(state.get_game(), depth_limit=1)
+  gametree = GameTreeViz(state, depth_limit=1)
   return gametree.to_string().encode()
 
+
+def state_from_history(game: pyspiel.Game, history_str: str) -> pyspiel.State:
+  rollout = game.new_initial_state()
+  history_str = history_str.strip()
+  if history_str:
+    for action in re.split("[\s,;]+", history_str):
+      if action:
+        rollout.apply_action(int(action))
+  return rollout
 
 
 class MainWindow:
@@ -94,6 +104,7 @@ class MainWindow:
     self.window.set_icon_from_file(ICON_FILE)
 
     self.plot_area = PlotArea(builder.get_object("plot_area"), self)
+    self.plot_area.connect("change_history", self.change_history)
     self.state_view_container = builder.get_object("state_view")
     self.state_history_container = builder.get_object("state_history")
     self.state_history = create_history_view(self.state_history_container)
@@ -117,6 +128,15 @@ class MainWindow:
     if cfg.WINDOW_MAXIMIZE:
       self.window.maximize()
     self.window.show_all()
+
+  def change_history(self, plot_area: PlotArea, history_str: str):
+    try:
+      state = state_from_history(self.game, history_str)
+      self.set_state(state)
+    except ValueError as e:
+      self.error_dialog(f"Could not parse history string '{history_str}': {e}")
+    except pyspiel.SpielError as e:
+      self.error_dialog(f"Could not seek to history '{history_str}': {e}")
 
   def update_game(self, entry):
     game_name = entry.get_text()
@@ -147,7 +167,7 @@ class MainWindow:
       self.state_view.update(state)
       self.state = state
       self.render()
-    except MemoryError as ex:
+    except pyspiel.SpielError as ex:
       self.error_dialog(str(ex))
       return False
 
@@ -233,4 +253,3 @@ class MainWindow:
     response = dialog.run()
     dialog.destroy()
     return response == Gtk.ResponseType.OK
-
