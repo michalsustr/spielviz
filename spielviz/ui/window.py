@@ -61,7 +61,7 @@ def create_history_entry(item: Gtk.ToolItem) -> HistoryEntry:
   return history_entry
 
 
-def Spinner(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
+def create_spin_button(item: Gtk.ToolItem, **kwargs) -> Gtk.SpinButton:
   spinbutton = Gtk.SpinButton()
 
   defaults = dict(
@@ -98,10 +98,16 @@ class MainWindow:
         builder.get_object("select_history"))
     self.select_history.connect(
         "activate", lambda entry: self.change_history(entry, entry.get_text()))
-    self.lookahead_spinner = Spinner(builder.get_object("lookahead"),
-                                     value=1, lower=1, upper=5)
-    self.lookbehind_spinner = Spinner(builder.get_object("lookbehind"),
-                                      lower=0, upper=20)
+
+    self.lookahead = 1
+    self.lookahead_spinner = create_spin_button(
+        builder.get_object("lookahead"), value=self.lookahead, lower=1, upper=5)
+    self.lookahead_spinner.connect("value-changed", self.update_lookahead)
+
+    self.lookbehind = 1
+    self.lookbehind_spinner = create_spin_button(
+        builder.get_object("lookbehind"), lower=self.lookbehind, upper=20)
+    self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
     # Apply styles.
     css_provider = Gtk.CssProvider()
@@ -113,6 +119,14 @@ class MainWindow:
     if cfg.WINDOW_MAXIMIZE:
       self.window.maximize()
     self.window.show_all()
+
+  def update_lookahead(self, button: Gtk.SpinButton):
+    self.lookahead = button.get_value_as_int()
+    self.set_state(self.state)
+
+  def update_lookbehind(self, button: Gtk.SpinButton):
+    self.lookbehind = button.get_value_as_int()
+    self.set_state(self.state)
 
   def change_history(self, origin_object: GObject, history_str: str):
     try:
@@ -142,7 +156,8 @@ class MainWindow:
   def set_state(self, state: pyspiel.State):
     logging.debug(f"Setting state '{str(state)}'")
     try:
-      dotcode = export_tree_dotcode(state)
+      dotcode = export_tree_dotcode(state, lookbehind=self.lookbehind,
+                                    lookahead=self.lookahead)
       xdotcode = make_xdotcode(dotcode)
       graph = make_graph(xdotcode)
       self.plot_area.set_graph(graph)
