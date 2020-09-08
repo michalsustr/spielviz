@@ -26,6 +26,7 @@ I will be working on this project probably very sporadically.
 
  * [ ] Make a warning when building a large graph, allow to cancel.
  * [ ] Show information about the `pyspiel.Game`.
+ * [ ] Use customizable Observer to show observations in the games.
  * [ ] Use keyboard to move withing the Graph (acejump-style).
  * [ ] Add custom game views (state view components) -- down_class python
        bindings for specific games.
