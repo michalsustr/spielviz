@@ -89,7 +89,7 @@ class GameTreeViz(pygraphviz.AGraph):
       attrs["height"] = cfg.PLOT_HEIGHT / 2.
       attrs["color"] = cfg.CHANCE_COLOR
     else:
-      attrs["label"] = str(state.information_state_string())
+      # attrs["label"] = str(state.information_state_string())
       attrs["shape"] = cfg.PLAYER_SHAPES.get(player, "square")
       attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
 

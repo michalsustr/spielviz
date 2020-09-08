@@ -167,12 +167,6 @@ class MainWindow:
       self.state_history.update(state)
       self.state_view.update(state)
       self.select_history.update(state)
-      # set_text(state.history_str())
-      # completion_model = self.select_history.get_completion().get_model()
-      # completion_model.clear()
-      # for i in range(100):
-      #   completion_model.append((str(i),))
-
       self.state = state
       self.render()
     except pyspiel.SpielError as ex:

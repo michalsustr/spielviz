@@ -41,4 +41,5 @@ class StringStateView(StateView):
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
+    # print("what up?", state)
     self.ttv.append(str(state))
