@@ -109,6 +109,11 @@ class MainWindow:
         builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
+    self.show_full_tree = False
+    self.full_tree = builder.get_object("full_tree")
+    self.full_tree.connect("toggled", self.toggle_full_tree)
+    self.full_tree.set_active(self.show_full_tree)
+
     # Apply styles.
     css_provider = Gtk.CssProvider()
     css_provider.load_from_path(css_file)
@@ -120,6 +125,18 @@ class MainWindow:
       self.window.maximize()
     self.window.set_title(BASE_TITLE)
     self.window.show_all()
+
+  def toggle_full_tree(self, button: Gtk.CheckButton):
+    do_show = button.get_active()
+    if do_show:
+      self.show_full_tree = True
+      self.lookbehind_spinner.set_sensitive(False)
+      self.lookahead_spinner.set_sensitive(False)
+    else:
+      self.show_full_tree = False
+      self.lookbehind_spinner.set_sensitive(True)
+      self.lookahead_spinner.set_sensitive(True)
+    self.set_state(self.state)
 
   def update_lookahead(self, button: Gtk.SpinButton):
     self.lookahead = button.get_value_as_int()
@@ -158,8 +175,11 @@ class MainWindow:
   def set_state(self, state: pyspiel.State):
     logging.debug(f"Setting state '{str(state)}'")
     try:
-      dotcode = export_tree_dotcode(state, lookbehind=self.lookbehind,
-                                    lookahead=self.lookahead)
+      dotcode = export_tree_dotcode(
+          state=state,
+          full_tree=self.show_full_tree,
+          lookbehind=self.lookbehind,
+          lookahead=self.lookahead)
       xdotcode = make_xdotcode(dotcode)
       graph = make_graph(xdotcode)
       self.plot_area.set_graph(graph)

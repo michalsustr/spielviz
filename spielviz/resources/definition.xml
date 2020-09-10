@@ -100,7 +100,6 @@
                   </object>
                 </child>
 
-                <!--
                 <child>
                   <object class="GtkToolItem">
                     <property name="margin">3</property>
@@ -109,6 +108,19 @@
                     </child>
                   </object>
                 </child>
+
+                <child>
+                  <object class="GtkToolItem">
+                    <child>
+                      <object class="GtkCheckButton" id="full_tree">
+                        <property name="name">full_tree</property>
+                        <property name="label">Show full tree</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
+                <!--
 
                 <child>
                   <object class="GtkToolButton" id="zoom_in">

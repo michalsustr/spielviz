@@ -10,7 +10,9 @@ from spielviz.logic.state_history import state_from_history
 class GameTreeViz(pygraphviz.AGraph):
   """Builds `pygraphviz.AGraph` of the game tree."""
 
-  def __init__(self, state: pyspiel.State = None, lookahead: int = 1,
+  def __init__(self, state: pyspiel.State = None,
+      full_tree: bool = False,
+      lookahead: int = 1,
       lookbehind: int = 1):
 
     super(GameTreeViz, self).__init__(directed=True)
@@ -18,21 +20,45 @@ class GameTreeViz(pygraphviz.AGraph):
     assert lookbehind >= 0
     assert lookahead >= 0
 
+    if full_tree:
+      self._build_full_tree(state.get_game().new_initial_state(), state)
+    else:
+      if lookbehind:
+        start_from = state_from_history(
+            state.get_game(), state.history()[:-lookbehind])
+        self.add_node(self.state_to_str(start_from),
+                      **self._node_decorator(start_from))
+        self._build_lookbehind(start_from, state)
+      self._build_lookahead(state, 0, lookahead)
+
     self.add_node(self.state_to_str(state),
                   **self._node_decorator(state, highlight_node=True))
-
-    if lookbehind:
-      start_from = state_from_history(
-          state.get_game(), state.history()[:-lookbehind])
-      self.add_node(self.state_to_str(start_from),
-                    **self._node_decorator(start_from))
-      self._build_lookbehind(start_from, state)
-    self._build_lookahead(state, 0, lookahead)
 
   def state_to_str(self, state):
     assert not state.is_simultaneous_node()
     # AGraph nodes can't have empty string == None as a key, thus we prepend " "
     return " " + state.history_str()
+
+  def _build_full_tree(self, start_from_state, arrive_to_state):
+    start_hist = start_from_state.history()
+    arrive_hist = arrive_to_state.history()
+    state_lies_on_trajectory = (
+        len(start_hist) < len(arrive_hist)
+        and arrive_hist[:len(start_hist)] == start_hist)
+    state_str = self.state_to_str(start_from_state)
+
+    for action in start_from_state.legal_actions():
+      child = start_from_state.child(action)
+      child_str = self.state_to_str(child)
+
+      edge_lies_on_trajectory = (
+          state_lies_on_trajectory and arrive_hist[len(start_hist)] == action)
+
+      self.add_node(child_str, **self._node_decorator(child))
+      self.add_edge(state_str, child_str, **self._edge_decorator(
+          start_from_state, action, highlight_edge=edge_lies_on_trajectory))
+
+      self._build_full_tree(child, arrive_to_state)
 
   def _build_lookbehind(self, start_from_state, arrive_to_state):
     start_hist = start_from_state.history()
