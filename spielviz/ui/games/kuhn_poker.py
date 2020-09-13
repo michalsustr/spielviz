@@ -1,6 +1,6 @@
 import pyspiel
 from gi.repository import Gtk
-from spielviz.ui.state_view import StringStateView, StateView
+from spielviz.ui.views.state_view import StringStateView, StateView
 
 
 class KuhnStateView(StringStateView):

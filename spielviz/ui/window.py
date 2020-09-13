@@ -1,27 +1,26 @@
-import os
 import re
 import logging
-from typing import List
+import re
 
 import pyspiel
-from gi.repository import Gtk, Gdk, Gio, GObject
+from gi.repository import Gtk, Gdk, GObject
 
 import spielviz.config as cfg
 from spielviz.dot.parser import make_graph, make_xdotcode
-from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.dotcode_tree import export_tree_dotcode
+from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.state_history import state_from_history_str
 from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
+from spielviz.ui.history_entry import HistoryEntry
 from spielviz.ui.plot_area import PlotArea
 from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
-from spielviz.ui.game_information_view import GameInformationView
-from spielviz.ui.player_view import PlayerView
-from spielviz.ui.rewards_view import RewardsView
-from spielviz.ui.history_view import HistoryView
-from spielviz.ui.observations_view import ObservationsView
-from spielviz.ui.history_entry import HistoryEntry
-from spielviz.ui.state_view import StateView, StringStateView
+from spielviz.ui.views.game_information_view import GameInformationView
+from spielviz.ui.views.history_view import HistoryView
+from spielviz.ui.views.observations_view import ObservationsView
+from spielviz.ui.views.player_view import PlayerView
+from spielviz.ui.views.rewards_view import RewardsView
+from spielviz.ui.views.state_view import StateView, StringStateView
 
 BASE_TITLE = 'SpielViz'
 UI_FILE = get_resource_path("definition.xml")
@@ -221,7 +220,7 @@ class MainWindow:
 
   def toggle_private_info(self, button: Gtk.RadioButton):
     active_radio = \
-    [r for r in self.private_info_none.get_group() if r.get_active()][0]
+      [r for r in self.private_info_none.get_group() if r.get_active()][0]
     if active_radio == self.private_info_none:
       self.show_private_info = pyspiel.PrivateInfoType.NONE
     if active_radio == self.private_info_single:

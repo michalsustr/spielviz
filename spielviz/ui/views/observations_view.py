@@ -1,14 +1,11 @@
-import os
 import logging
-import re
-import numpy as np
-import spielviz.config as cfg
-from spielviz.ui.primitives.tagged_view import TaggedTextView
-import pyspiel
-from gi.repository import Gtk, Pango
 
-from spielviz.ui.utils import player_to_str
+import numpy as np
+import pyspiel
+from gi.repository import Gtk
 from open_spiel.python.observation import make_observation
+
+from spielviz.ui.primitives.tagged_view import TaggedTextView
 
 
 def _escape(x):

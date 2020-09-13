@@ -1,9 +1,8 @@
-import spielviz.config as cfg
-from spielviz.ui.primitives.tagged_view import TaggedTextView
 import pyspiel
-from gi.repository import Gtk, Pango
+from gi.repository import Gtk
 
-from spielviz.ui.utils import player_to_str
+from spielviz.ui.primitives.tagged_view import TaggedTextView
+
 
 class RewardsView:
   """
