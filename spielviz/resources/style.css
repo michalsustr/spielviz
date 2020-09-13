@@ -1,3 +1,6 @@
 #state_history * {
   font-family: monospace;
 }
+Gtk.TextView {
+  font-family: monospace;
+}

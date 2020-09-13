@@ -15,7 +15,11 @@ from spielviz.resources import get_resource_path
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.plot_area import PlotArea
 from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
+from spielviz.ui.game_information_view import GameInformationView
+from spielviz.ui.player_view import PlayerView
+from spielviz.ui.rewards_view import RewardsView
 from spielviz.ui.history_view import HistoryView
+from spielviz.ui.observations_view import ObservationsView
 from spielviz.ui.history_entry import HistoryEntry
 from spielviz.ui.state_view import StateView, StringStateView
 
@@ -33,19 +37,48 @@ def create_state_view(game: pyspiel.Game,
     return StringStateView(game, container)
 
 
-def create_history_view(container: Gtk.ScrolledWindow) -> HistoryView:
+def make_text_view():
   tv = Gtk.TextView()
   tv.set_wrap_mode(Gtk.WrapMode.WORD)
-  tv.set_left_margin(5)
-  tv.set_right_margin(5)
-  tv.set_top_margin(5)
-  tv.set_bottom_margin(5)
+  tv.set_left_margin(15)
+  tv.set_border_width(2)
   tv.set_cursor_visible(False)
   tv.set_accepts_tab(False)
   tv.set_editable(False)
   tv.set_monospace(True)
+  # tv.set_fill(True)
+  return tv
+
+
+def create_history_view(container: Gtk.ScrolledWindow) -> HistoryView:
+  tv = make_text_view()
   container.add(tv)
   return HistoryView(tv)
+
+
+def create_game_information_view(
+    container: Gtk.ScrolledWindow) -> GameInformationView:
+  tv = make_text_view()
+  container.add(tv)
+  return GameInformationView(tv)
+
+
+def create_player_view(container: Gtk.ScrolledWindow) -> PlayerView:
+  tv = make_text_view()
+  container.add(tv)
+  return PlayerView(tv)
+
+
+def create_rewards_view(container: Gtk.ScrolledWindow) -> RewardsView:
+  tv = make_text_view()
+  container.add(tv)
+  return RewardsView(tv)
+
+
+def create_observations_view(container: Gtk.ScrolledWindow) -> ObservationsView:
+  tv = make_text_view()
+  container.add(tv)
+  return ObservationsView(tv)
 
 
 def create_game_selector(item: Gtk.ToolItem):
@@ -89,8 +122,44 @@ class MainWindow:
     self.plot_area = PlotArea(builder.get_object("plot_area"), self)
     self.plot_area.connect("change_history", self.change_history)
     self.state_view_container = builder.get_object("state_view")
-    self.state_history_container = builder.get_object("state_history")
-    self.state_history = create_history_view(self.state_history_container)
+
+    self.history_container = builder.get_object("history")
+    self.history_view = create_history_view(self.history_container)
+
+    self.game_information_container = builder.get_object("game_information")
+    self.game_information_view = create_game_information_view(
+        self.game_information_container)
+
+    self.player_container = builder.get_object("player")
+    self.player_view = create_player_view(self.player_container)
+
+    self.rewards_container = builder.get_object("rewards")
+    self.rewards_view = create_rewards_view(self.rewards_container)
+
+    self.observation_private_info = pyspiel.PrivateInfoType.NONE
+    self.observations_container = builder.get_object("observations")
+    self.observations_view = create_observations_view(
+        self.observations_container)
+    self.observing_player = 0
+
+    self.show_public_info = True
+    self.public_info = builder.get_object("public_info")
+    self.public_info.set_active(self.show_public_info)
+    self.public_info.connect("toggled", self.toggle_public_info)
+
+    self.show_perfect_recall = False
+    self.perfect_recall = builder.get_object("perfect_recall")
+    self.perfect_recall.set_active(self.show_perfect_recall)
+    self.perfect_recall.connect("toggled", self.toggle_perfect_recall)
+
+    self.show_private_info = pyspiel.PrivateInfoType.SINGLE_PLAYER
+    self.private_info_none = builder.get_object("private_info_none")
+    self.private_info_single = builder.get_object("private_info_single")
+    self.private_info_all = builder.get_object("private_info_all")
+    self.private_info_single.set_active(True)
+    self.private_info_none.connect("toggled", self.toggle_private_info)
+    self.private_info_single.connect("toggled", self.toggle_private_info)
+    self.private_info_all.connect("toggled", self.toggle_private_info)
 
     self.select_game = create_game_selector(builder.get_object("select_game"))
     self.select_game.connect("activate", self.update_game)
@@ -109,9 +178,9 @@ class MainWindow:
         builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
-    self.show_full_tree = False
     self.full_tree = builder.get_object("full_tree")
     self.full_tree.connect("toggled", self.toggle_full_tree)
+    self.show_full_tree = False
     self.full_tree.set_active(self.show_full_tree)
 
     # Apply styles.
@@ -136,6 +205,30 @@ class MainWindow:
       self.show_full_tree = False
       self.lookbehind_spinner.set_sensitive(True)
       self.lookahead_spinner.set_sensitive(True)
+    self.set_state(self.state)
+
+  def toggle_public_info(self, button: Gtk.CheckButton):
+    do_show = button.get_active()
+    self.show_public_info = do_show
+    self.update_observer()
+    self.set_state(self.state)
+
+  def toggle_perfect_recall(self, button: Gtk.CheckButton):
+    do_show = button.get_active()
+    self.show_perfect_recall = do_show
+    self.update_observer()
+    self.set_state(self.state)
+
+  def toggle_private_info(self, button: Gtk.RadioButton):
+    active_radio = \
+    [r for r in self.private_info_none.get_group() if r.get_active()][0]
+    if active_radio == self.private_info_none:
+      self.show_private_info = pyspiel.PrivateInfoType.NONE
+    if active_radio == self.private_info_single:
+      self.show_private_info = pyspiel.PrivateInfoType.SINGLE_PLAYER
+    if active_radio == self.private_info_all:
+      self.show_private_info = pyspiel.PrivateInfoType.ALL_PLAYERS
+    self.update_observer()
     self.set_state(self.state)
 
   def update_lookahead(self, button: Gtk.SpinButton):
@@ -170,7 +263,14 @@ class MainWindow:
     self.window.set_title(f"{BASE_TITLE}: {game}")
     self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
+    self.game_information_view.update(game)
+    self.update_observer()
     self.set_state(self.game.new_initial_state())
+
+  def update_observer(self):
+    self.observations_view.change_observation(
+        self.game, self.observing_player, self.show_public_info,
+        self.show_perfect_recall, self.show_private_info)
 
   def set_state(self, state: pyspiel.State):
     logging.debug(f"Setting state '{str(state)}'")
@@ -184,8 +284,11 @@ class MainWindow:
       graph = make_graph(xdotcode)
       self.plot_area.set_graph(graph)
 
-      self.state_history.update(state)
+      self.history_view.update(state)
       self.state_view.update(state)
+      self.player_view.update(state)
+      self.rewards_view.update(state)
+      self.observations_view.update(state)
       self.select_history.update(state)
       self.state = state
       self.render()
@@ -194,9 +297,10 @@ class MainWindow:
       return False
 
   def render(self):
-    self.state_history_container.show_all()
-    self.state_view_container.show_all()
+    # self.state_history_container.show_all()
+    # self.state_view_container.show_all()
     self.plot_area.show_all()
+    pass
 
   def find_text(self, entry_text):
     found_items = []
