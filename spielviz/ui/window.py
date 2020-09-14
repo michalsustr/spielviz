@@ -170,9 +170,9 @@ class MainWindow:
         builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
+    self.show_full_tree = cfg.FULL_TREE
     self.full_tree = builder.get_object("full_tree")
     self.full_tree.connect("toggled", self.toggle_full_tree)
-    self.show_full_tree = False
     self.full_tree.set_active(self.show_full_tree)
 
     # Apply styles.
