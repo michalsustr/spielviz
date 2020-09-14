@@ -18,3 +18,7 @@ class RewardsView:
       self.ttv.append_player_list(state.rewards())
     else:
       self.ttv.append("(not available)", self.ttv.TAG_NOTE)
+
+    min_util = state.get_game().min_utility()
+    max_util = state.get_game().max_utility()
+    self.ttv.append(f"\nGame min: {min_util}   max: {max_util}")

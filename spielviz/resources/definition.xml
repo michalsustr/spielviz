@@ -359,13 +359,18 @@
                               <object class="GtkBox">
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="public_info">
-                                    <property name="label">Public info</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkCheckButton" id="perfect_recall">
-                                    <property name="label">Perfect recall</property>
+                                  <object class="GtkBox">
+                                    <property name="orientation">horizontal</property>
+                                    <child>
+                                      <object class="GtkCheckButton" id="public_info">
+                                        <property name="label">Public info</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="perfect_recall">
+                                        <property name="label">Perfect recall</property>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                                 <child>
@@ -396,19 +401,15 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkBox">
-                                    <child>
-                                      <object class="GtkTextView" id="observations">
-                                        <property name="cursor_visible">False</property>
-                                        <property name="accepts_tab">False</property>
-                                        <property name="editable">False</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">True</property>
-                                        <property name="fill">True</property>
-                                      </packing>
-                                    </child>
+                                  <object class="GtkTextView" id="observations">
+                                    <property name="cursor_visible">False</property>
+                                    <property name="accepts_tab">False</property>
+                                    <property name="editable">False</property>
                                   </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>
