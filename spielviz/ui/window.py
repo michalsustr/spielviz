@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import Optional
 
 import pyspiel
 from gi.repository import Gtk, Gdk, GObject
@@ -17,10 +18,10 @@ from spielviz.ui.primitives.completing_combo_box import CompletingComboBoxText
 from spielviz.ui.views.game_information_view import GameInformationView
 from spielviz.ui.views.history_view import HistoryView
 from spielviz.ui.views.observations_view import ObservationsView
+from spielviz.ui.views.observing_player_view import ObservingPlayerView
 from spielviz.ui.views.player_view import PlayerView
 from spielviz.ui.views.rewards_view import RewardsView
 from spielviz.ui.views.state_view import StateView, StringStateView
-from spielviz.ui.views.observing_player_view import ObservingPlayerView
 
 BASE_TITLE = 'SpielViz'
 UI_FILE = get_resource_path("definition.xml")
@@ -34,50 +35,6 @@ def create_state_view(game: pyspiel.Game,
     return create_custom_state_view(game, container)
   else:
     return StringStateView(game, container)
-
-
-def make_text_view():
-  tv = Gtk.TextView()
-  tv.set_wrap_mode(Gtk.WrapMode.WORD)
-  # tv.set_left_margin(15)
-  # tv.set_border_width(2)
-  tv.set_cursor_visible(False)
-  tv.set_accepts_tab(False)
-  tv.set_editable(False)
-  tv.set_monospace(True)
-  # tv.set_fill(True)
-  return tv
-
-
-def create_history_view(container: Gtk.ScrolledWindow) -> HistoryView:
-  tv = make_text_view()
-  container.add(tv)
-  return HistoryView(tv)
-
-
-def create_game_information_view(
-    container: Gtk.ScrolledWindow) -> GameInformationView:
-  tv = make_text_view()
-  container.add(tv)
-  return GameInformationView(tv)
-
-
-def create_player_view(container: Gtk.ScrolledWindow) -> PlayerView:
-  tv = make_text_view()
-  container.add(tv)
-  return PlayerView(tv)
-
-
-def create_rewards_view(container: Gtk.ScrolledWindow) -> RewardsView:
-  tv = make_text_view()
-  container.add(tv)
-  return RewardsView(tv)
-
-
-def create_observations_view(container: Gtk.ScrolledWindow) -> ObservationsView:
-  tv = make_text_view()
-  container.add(tv)
-  return ObservationsView(tv)
 
 
 def create_game_selector(item: Gtk.ToolItem):
@@ -112,6 +69,9 @@ class MainWindow:
     builder = Gtk.Builder()
     builder.add_from_file(ui_file)
     builder.connect_signals(self)
+
+    self.state = None
+    self.game = None
 
     self.window = builder.get_object("window")
     self.window.connect('delete-event', Gtk.main_quit)
@@ -259,7 +219,10 @@ class MainWindow:
     except pyspiel.SpielError:
       self.error_dialog(f"Could not load '{game_name}'")
 
-  def set_game(self, game: pyspiel.Game):
+  def set_game(self, game: Optional[pyspiel.Game]):
+    if game is None:
+      return
+
     logging.debug(f"Setting game '{game}'")
     self.window.set_title(f"{BASE_TITLE}: {game}")
     self.game = game
@@ -274,7 +237,10 @@ class MainWindow:
         self.game, self.observing_player, self.show_public_info,
         self.show_perfect_recall, self.show_private_info)
 
-  def set_state(self, state: pyspiel.State):
+  def set_state(self, state: Optional[pyspiel.State]):
+    if state is None:
+      return
+
     logging.debug(f"Setting state '{str(state)}'")
     try:
       gametree = GameTreeViz(state=state,

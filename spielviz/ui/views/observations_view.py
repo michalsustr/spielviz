@@ -75,6 +75,8 @@ class ObservationsView:
 
   def __init__(self, container: Gtk.TextView):
     self.ttv = TaggedTextView(container)
+    self.player = 0
+    self.observation = None
 
   def change_observation(self,
       game: pyspiel.Game, player: int,
@@ -83,7 +85,6 @@ class ObservationsView:
     self.player = player
     observation_type = pyspiel.IIGObservationType(
         public_info, perfect_recall, private_info)
-    logging.info(f"Observing PL{player} by {public_info}")
     self.observation = make_observation(game, observation_type)
 
   def update(self, state: pyspiel.State):
