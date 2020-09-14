@@ -15,10 +15,15 @@ class HistoryView:
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
-    game = state.get_game()
+    self.ttv.append("Move number: ", self.ttv.TAG_SECTION)
+    self.ttv.append(str(state.move_number()))
 
+    if state.is_initial_state():
+      self.ttv.append("\nThis is the initial state.", self.ttv.TAG_NOTE)
+
+    game = state.get_game()
     rollout = game.new_initial_state()
     for action in state.history():
-      self.ttv.appendln_pl(f"{action}: {rollout.action_to_string(action)}",
+      self.ttv.append_pl(f"\n{action}: {rollout.action_to_string(action)}",
                            rollout.current_player())
       rollout.apply_action(action)
