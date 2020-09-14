@@ -1,5 +1,3 @@
-import collections
-
 import pygraphviz
 import pyspiel
 
@@ -16,23 +14,30 @@ class GameTreeViz(pygraphviz.AGraph):
       lookbehind: int = 1):
 
     super(GameTreeViz, self).__init__(directed=True)
-
     assert lookbehind >= 0
     assert lookahead >= 0
+    self.state = state
+    self.game = state.get_game()
+    self.full_tree = full_tree
+    self.lookahead = lookahead
+    self.lookbehind = lookbehind
 
-    if full_tree:
-      self._build_full_tree(state.get_game().new_initial_state(), state)
+  def build_tree(self):
+    if self.full_tree:
+      yield from self._build_full_tree(self.game.new_initial_state(),
+                                       self.state)
     else:
-      if lookbehind:
-        start_from = state_from_history(
-            state.get_game(), state.history()[:-lookbehind])
+      if self.lookbehind:
+        start_from = state_from_history(self.game,
+                                        self.state.history()[:-self.lookbehind])
         self.add_node(self.state_to_str(start_from),
                       **self._node_decorator(start_from))
-        self._build_lookbehind(start_from, state)
-      self._build_lookahead(state, 0, lookahead)
+        yield from self._build_lookbehind(start_from, self.state)
+      yield from self._build_lookahead(self.state, 0, self.lookahead)
 
-    self.add_node(self.state_to_str(state),
-                  **self._node_decorator(state, highlight_node=True))
+    self.add_node(self.state_to_str(self.state),
+                  **self._node_decorator(self.state, highlight_node=True))
+    yield self.state
 
   def state_to_str(self, state):
     assert not state.is_simultaneous_node()
@@ -58,7 +63,8 @@ class GameTreeViz(pygraphviz.AGraph):
       self.add_edge(state_str, child_str, **self._edge_decorator(
           start_from_state, action, highlight_edge=edge_lies_on_trajectory))
 
-      self._build_full_tree(child, arrive_to_state)
+      yield child
+      yield from self._build_full_tree(child, arrive_to_state)
 
   def _build_lookbehind(self, start_from_state, arrive_to_state):
     start_hist = start_from_state.history()
@@ -77,8 +83,9 @@ class GameTreeViz(pygraphviz.AGraph):
       self.add_edge(state_str, child_str, **self._edge_decorator(
           start_from_state, action, highlight_edge=lies_on_trajectory))
 
+      yield child
       if lies_on_trajectory:
-        self._build_lookbehind(child, arrive_to_state)
+        yield from self._build_lookbehind(child, arrive_to_state)
 
   def _build_lookahead(self, state, depth, lookahead):
     state_str = self.state_to_str(state)
@@ -93,7 +100,9 @@ class GameTreeViz(pygraphviz.AGraph):
       child_str = self.state_to_str(child)
       self.add_node(child_str, **self._node_decorator(child))
       self.add_edge(state_str, child_str, **self._edge_decorator(state, action))
-      self._build_lookahead(child, depth + 1, lookahead)
+      yield child
+      for node in self._build_lookahead(child, depth + 1, lookahead):
+        yield child
 
   def _node_decorator(self, state, highlight_node=False):
     player = state.current_player()
@@ -134,12 +143,3 @@ class GameTreeViz(pygraphviz.AGraph):
     if highlight_edge:
       attrs["penwidth"] = cfg.PLOT_HIGHLIGHT_PENWIDTH
     return attrs
-
-
-def export_tree_dotcode(state: pyspiel.State, **kwargs) -> bytes:
-  """
-  Use treeviz to export the current pyspiel.State as graphviz dotcode.
-  This will be subsequently rendered in PlotArea.
-  """
-  gametree = GameTreeViz(state, **kwargs)
-  return gametree.to_string().encode()

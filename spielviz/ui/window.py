@@ -6,7 +6,7 @@ from gi.repository import Gtk, Gdk, GObject
 
 import spielviz.config as cfg
 from spielviz.dot.parser import make_graph, make_xdotcode
-from spielviz.logic.dotcode_tree import export_tree_dotcode
+from spielviz.logic.dotcode_tree import GameTreeViz
 from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.state_history import state_from_history_str
 from spielviz.resources import get_resource_path
@@ -267,11 +267,19 @@ class MainWindow:
   def set_state(self, state: pyspiel.State):
     logging.debug(f"Setting state '{str(state)}'")
     try:
-      dotcode = export_tree_dotcode(
-          state=state,
-          full_tree=self.show_full_tree,
-          lookbehind=self.lookbehind,
-          lookahead=self.lookahead)
+      gametree = GameTreeViz(state=state,
+                             full_tree=self.show_full_tree,
+                             lookbehind=self.lookbehind,
+                             lookahead=self.lookahead)
+      count = 0
+      for _ in gametree.build_tree():
+        if count >= cfg.TREE_MAX_NODES:
+          self.error_dialog("There are too many nodes in the tree.\n"
+                            f"Showing only {count} of them.")
+          break
+        count += 1
+
+      dotcode = gametree.to_string().encode()
       xdotcode = make_xdotcode(dotcode)
       graph = make_graph(xdotcode)
       self.plot_area.set_graph(graph)
