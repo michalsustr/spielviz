@@ -1,4 +1,3 @@
-import re
 import logging
 import re
 
@@ -39,8 +38,8 @@ def create_state_view(game: pyspiel.Game,
 def make_text_view():
   tv = Gtk.TextView()
   tv.set_wrap_mode(Gtk.WrapMode.WORD)
-  tv.set_left_margin(15)
-  tv.set_border_width(2)
+  # tv.set_left_margin(15)
+  # tv.set_border_width(2)
   tv.set_cursor_visible(False)
   tv.set_accepts_tab(False)
   tv.set_editable(False)
@@ -122,23 +121,17 @@ class MainWindow:
     self.plot_area.connect("change_history", self.change_history)
     self.state_view_container = builder.get_object("state_view")
 
-    self.history_container = builder.get_object("history")
-    self.history_view = create_history_view(self.history_container)
+    self.history_view = HistoryView(builder.get_object("history"))
 
-    self.game_information_container = builder.get_object("game_information")
-    self.game_information_view = create_game_information_view(
-        self.game_information_container)
+    self.game_information_view = GameInformationView(
+        builder.get_object("game_information"))
 
-    self.player_container = builder.get_object("player")
-    self.player_view = create_player_view(self.player_container)
+    self.player_view = PlayerView(builder.get_object("player"))
 
-    self.rewards_container = builder.get_object("rewards")
-    self.rewards_view = create_rewards_view(self.rewards_container)
+    self.rewards_view = RewardsView(builder.get_object("rewards"))
 
     self.observation_private_info = pyspiel.PrivateInfoType.NONE
-    self.observations_container = builder.get_object("observations")
-    self.observations_view = create_observations_view(
-        self.observations_container)
+    self.observations_view = ObservationsView(builder.get_object("observations"))
     self.observing_player = 0
 
     self.show_public_info = True

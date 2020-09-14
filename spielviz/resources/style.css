@@ -1,6 +1,15 @@
-#state_history * {
-  font-family: monospace;
+expander > box {
+  padding-left: 12px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
-Gtk.TextView {
+expander {
+  border-bottom: 1px solid #ddd;
+}
+textview {
   font-family: monospace;
+  font-size: 14px;
+  -cursor-visible: false;
+  -accepts-tab: false;
+  -editable: false;
 }

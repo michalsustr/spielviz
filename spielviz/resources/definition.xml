@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkTextBuffer" id="asdf">
+    <property name="text" translatable="yes">Please input text here...</property>
+  </object>
+
   <object class="GtkWindow" id="window">
-    <property name="name">window</property>
     <property name="width_request">-1</property>
     <property name="height_request">600</property>
     <property name="can_focus">False</property>
@@ -16,7 +19,6 @@
           <object class="GtkFrame">
             <child>
               <object class="GtkToolbar" id="toolbar">
-                <property name="name">toolbar</property>
                 <child>
                   <object class="GtkToolItem">
                     <property name="margin-right">2</property>
@@ -30,7 +32,6 @@
 
                 <child>
                   <object class="GtkToolItem" id="select_game">
-                    <property name="name">select_game</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                   </object>
@@ -50,7 +51,6 @@
 
                 <child>
                   <object class="GtkToolItem" id="select_history">
-                    <property name="name">select_history</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="margin">3</property>
@@ -71,7 +71,6 @@
 
                 <child>
                   <object class="GtkToolItem" id="lookahead">
-                    <property name="name">lookahead</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="margin">3</property>
@@ -93,7 +92,6 @@
 
                 <child>
                   <object class="GtkToolItem" id="lookbehind">
-                    <property name="name">lookbehind</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="margin">3</property>
@@ -113,7 +111,6 @@
                   <object class="GtkToolItem">
                     <child>
                       <object class="GtkCheckButton" id="full_tree">
-                        <property name="name">full_tree</property>
                         <property name="label">Show full tree</property>
                       </object>
                     </child>
@@ -124,7 +121,6 @@
 
                 <child>
                   <object class="GtkToolButton" id="zoom_in">
-                    <property name="name">zoom_in</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="action_name">app.zoom_in</property>
@@ -141,7 +137,6 @@
 
                 <child>
                   <object class="GtkToolButton" id="zoom_out">
-                    <property name="name">zoom_out</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="action_name">app.zoom_out</property>
@@ -158,7 +153,6 @@
 
                 <child>
                   <object class="GtkToolButton" id="fullscreen_button">
-                    <property name="name">fullscreen_button</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="action_name">app.fullscreen</property>
@@ -175,7 +169,6 @@
 
                 <child>
                   <object class="GtkToolButton" id="undo_button">
-                    <property name="name">undo_button</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="action_name">app.undo</property>
@@ -192,8 +185,6 @@
 
                 <child>
                   <object class="GtkToolButton" id="redo_button">
-                    <property name="name">redo_button</property>
-                    <property name="name">redo_button</property>
                     <property name="can_focus">False</property>
                     <property name="is_important">True</property>
                     <property name="action_name">app.redo</property>
@@ -218,7 +209,6 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkPaned" id="state_info">
-                <property name="name">state_info</property>
                 <property name="width_request">350</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -236,7 +226,6 @@
                         </child>
                         <child>
                           <object class="GtkScrolledWindow" id="state_view">
-                            <property name="name">state_view</property>
                             <property name="can_focus">False</property>
                             <property name="expand">True</property>
                             <property name="height_request">250</property>
@@ -255,8 +244,6 @@
                   <object class="GtkScrolledWindow">
                     <property name="shadow_type">GTK_SHADOW_IN</property>
                     <property name="can_focus">False</property>
-                    <!--                    <property name="expand">True</property>-->
-
                     <child>
                       <object class="GtkBox">
                         <property name="orientation">vertical</property>
@@ -269,9 +256,17 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkBox" id="game_information">
+                              <object class="GtkBox">
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkTextView" id="game_information">
+                                    <property name="cursor_visible">False</property>
+                                    <property name="accepts_tab">False</property>
+                                    <property name="editable">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>
@@ -286,9 +281,17 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkBox" id="player">
+                              <object class="GtkBox">
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkTextView" id="player">
+                                    <property name="cursor_visible">False</property>
+                                    <property name="accepts_tab">False</property>
+                                    <property name="editable">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>
@@ -303,9 +306,17 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkBox" id="rewards">
+                              <object class="GtkBox">
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkTextView" id="rewards">
+                                    <property name="cursor_visible">False</property>
+                                    <property name="accepts_tab">False</property>
+                                    <property name="editable">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>
@@ -320,10 +331,17 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkBox" id="history">
-                                <property name="name">history</property>
+                              <object class="GtkBox">
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkTextView" id="history">
+                                    <property name="cursor_visible">False</property>
+                                    <property name="accepts_tab">False</property>
+                                    <property name="editable">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>
@@ -339,7 +357,6 @@
                             </child>
                             <child>
                               <object class="GtkBox">
-                                <property name="name">observations</property>
                                 <property name="orientation">vertical</property>
                                 <child>
                                   <object class="GtkCheckButton" id="public_info">
@@ -379,9 +396,17 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkBox" id="observations">
+                                  <object class="GtkBox">
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkTextView" id="observations">
+                                        <property name="cursor_visible">False</property>
+                                        <property name="accepts_tab">False</property>
+                                        <property name="editable">False</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                      </packing>
                                     </child>
                                   </object>
                                 </child>
@@ -398,7 +423,6 @@
 
             <child>
               <object class="GtkDrawingArea" id="plot_area">
-                <property name="name">plot_area</property>
                 <property name="can_focus">False</property>
               </object>
             </child>
