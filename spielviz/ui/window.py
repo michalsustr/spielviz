@@ -289,8 +289,7 @@ class MainWindow:
       return False
 
   def render(self):
-    # self.state_history_container.show_all()
-    # self.state_view_container.show_all()
+    self.state_view_container.show_all()
     self.plot_area.show_all()
     pass
 

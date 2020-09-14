@@ -37,10 +37,18 @@ class StringStateView(StateView):
     text_view.set_accepts_tab(False)
     text_view.set_editable(False)
     text_view.set_monospace(True)
+
+    maybe_child = container.get_child()
+    if maybe_child:
+      container.remove(maybe_child)
     container.add(text_view)
     self.ttv = TaggedTextView(text_view)
+    container.show_all()
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
-    # print("what up?", state)
-    self.ttv.append(str(state))
+    state_str = str(state)
+    if state_str:
+      self.ttv.append(state_str)
+    else:
+      self.ttv.append(f"(empty state string)")
