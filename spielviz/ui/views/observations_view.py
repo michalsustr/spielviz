@@ -96,4 +96,8 @@ class ObservationsView:
         self.ttv.appendln(ln)
 
     self.ttv.appendln("\nString:", self.ttv.TAG_SECTION)
-    self.ttv.append(self.observation.string_from(state, player=self.player))
+    obs_string = self.observation.string_from(state, player=self.player)
+    if obs_string:
+      self.ttv.append(obs_string)
+    else:
+      self.ttv.append("(empty)", self.ttv.TAG_NOTE)
