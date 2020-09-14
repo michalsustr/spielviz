@@ -88,8 +88,12 @@ class ObservationsView:
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
-    self.ttv.appendln(self.observation.string_from(state, player=self.player))
     self.observation.set_from(state, player=self.player)
+
+    self.ttv.appendln("Tensor:", self.ttv.TAG_SECTION)
     for name, tensor in self.observation.dict.items():
       for ln in _format_tensor(tensor, name):
         self.ttv.appendln(ln)
+
+    self.ttv.appendln("\nString:", self.ttv.TAG_SECTION)
+    self.ttv.append(self.observation.string_from(state, player=self.player))
