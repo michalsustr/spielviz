@@ -401,6 +401,23 @@
                                   </object>
                                 </child>
                                 <child>
+                                  <object class="GtkBox">
+                                    <property name="orientation">horizontal</property>
+                                    <property name="margin-bottom">10</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label">Observing player:</property>
+                                        <property name="margin-right">10</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkComboBoxText" id="observing_player">
+                                        <property name="margin-right">5</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkTextView" id="observations">
                                     <property name="cursor_visible">False</property>
                                     <property name="accepts_tab">False</property>

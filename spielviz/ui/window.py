@@ -20,6 +20,7 @@ from spielviz.ui.views.observations_view import ObservationsView
 from spielviz.ui.views.player_view import PlayerView
 from spielviz.ui.views.rewards_view import RewardsView
 from spielviz.ui.views.state_view import StateView, StringStateView
+from spielviz.ui.views.observing_player_view import ObservingPlayerView
 
 BASE_TITLE = 'SpielViz'
 UI_FILE = get_resource_path("definition.xml")
@@ -132,6 +133,9 @@ class MainWindow:
 
     self.observation_private_info = pyspiel.PrivateInfoType.NONE
     self.observations_view = ObservationsView(builder.get_object("observations"))
+    self.observing_player_combo = builder.get_object("observing_player")
+    self.observing_player_combo.connect("changed", self.change_observing_player)
+    self.observing_player_view = ObservingPlayerView(self.observing_player_combo)
     self.observing_player = 0
 
     self.show_public_info = True
@@ -186,6 +190,11 @@ class MainWindow:
       self.window.maximize()
     self.window.set_title(BASE_TITLE)
     self.window.show_all()
+
+  def change_observing_player(self, combo: Gtk.ComboBox):
+    self.observing_player = combo.get_active()
+    self.update_observer()
+    self.set_state(self.state)
 
   def toggle_full_tree(self, button: Gtk.CheckButton):
     do_show = button.get_active()
@@ -256,6 +265,7 @@ class MainWindow:
     self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.game_information_view.update(game)
+    self.observing_player_view.update(game)
     self.update_observer()
     self.set_state(self.game.new_initial_state())
 
