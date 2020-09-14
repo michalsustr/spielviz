@@ -43,15 +43,16 @@ class GameInformationView:
 
     self.ttv.append("\n\n")
     self.ttv.append("")
-    self.ttv.append("Max chance outcomes: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.max_chance_outcomes()))
-    self.ttv.append("Num distinct actions: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.num_distinct_actions()))
-    self.ttv.append("Max game length: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.max_game_length()))
-    self.ttv.append("Min utility: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.min_utility()))
-    self.ttv.append("Max utility: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.max_utility()))
-    self.ttv.append("Utility sum: ", self.ttv.TAG_SECTION)
-    self.ttv.appendln(str(game.utility_sum()))
+
+    def append_optional(label, callback):
+      self.ttv.append(label, self.ttv.TAG_SECTION)
+      try:
+        self.ttv.appendln(str(callback()))
+      except RuntimeError:
+        self.ttv.appendln("(not available)", self.ttv.TAG_NOTE)
+
+    append_optional("Max chance outcomes: ", game.max_chance_outcomes)
+    append_optional("Num distinct actions: ", game.num_distinct_actions)
+    append_optional("Max game length: ", game.max_game_length)
+    append_optional("Min utility: ", game.min_utility)
+    append_optional("Max utility: ", game.max_utility)
