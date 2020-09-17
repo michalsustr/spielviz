@@ -96,7 +96,7 @@ class MainWindow:
     self.observing_player_combo = builder.get_object("observing_player")
     self.observing_player_combo.connect("changed", self.change_observing_player)
     self.observing_player_view = ObservingPlayerView(self.observing_player_combo)
-    self.observing_player = 0
+    self.observing_player = cfg.OBSERVING_PLAYER
 
     self.show_public_info = True
     self.public_info = builder.get_object("public_info")
@@ -152,7 +152,11 @@ class MainWindow:
     self.window.show_all()
 
   def change_observing_player(self, combo: Gtk.ComboBox):
-    self.observing_player = combo.get_active()
+    observing_player = combo.get_active()
+    if observing_player == 0:
+      self.observing_player = None
+    else:
+      self.observing_player = observing_player - 1
     self.update_observer()
     self.set_state(self.state)
 
@@ -228,7 +232,13 @@ class MainWindow:
     self.game = game
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.game_information_view.update(game)
-    self.observing_player_view.update(game)
+
+    # The number of players may change when we update the game.
+    # Window manages the state of the observing_player so we update it here too.
+    if self.observing_player is not None \
+        and self.observing_player >= game.num_players():
+      self.observing_player = None
+    self.observing_player_view.update(game, self.observing_player)
     self.update_observer()
     self.set_state(self.game.new_initial_state())
 

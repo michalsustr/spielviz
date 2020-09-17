@@ -109,3 +109,5 @@ TREE_MAX_NODES = user_cfg.TREE_MAX_NODES or 1000
 LOOKAHEAD = user_cfg.LOOKAHEAD or 1
 LOOKBEHIND = user_cfg.LOOKAHEAD or 1
 FULL_TREE = user_cfg.FULL_TREE or False
+# Use None for the player at current state, or 0 ... N-1
+OBSERVING_PLAYER = user_cfg.OBSERVING_PLAYER or None

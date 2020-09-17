@@ -1,11 +1,10 @@
-import logging
-
 import numpy as np
 import pyspiel
 from gi.repository import Gtk
 from open_spiel.python.observation import make_observation
 
 from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.utils import player_to_str
 
 
 def _escape(x):
@@ -75,7 +74,7 @@ class ObservationsView:
 
   def __init__(self, container: Gtk.TextView):
     self.ttv = TaggedTextView(container)
-    self.player = 0
+    self.player = None  # Player not specified, i.e. the state.current_player()
     self.observation = None
 
   def change_observation(self,
@@ -89,16 +88,27 @@ class ObservationsView:
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
-    self.observation.set_from(state, player=self.player)
 
-    self.ttv.appendln("Tensor:", self.ttv.TAG_SECTION)
-    for name, tensor in self.observation.dict.items():
-      for ln in _format_tensor(tensor, name):
-        self.ttv.appendln(ln)
+    observer_as_player = state.current_player() \
+      if self.player is None else self.player
 
-    self.ttv.appendln("\nString:", self.ttv.TAG_SECTION)
-    obs_string = self.observation.string_from(state, player=self.player)
-    if obs_string:
-      self.ttv.append(obs_string)
+    if 0 <= observer_as_player < state.get_game().num_players():
+      self.observation.set_from(state, player=observer_as_player)
+
+      self.ttv.appendln("Tensor:", self.ttv.TAG_SECTION)
+      for name, tensor in self.observation.dict.items():
+        for ln in _format_tensor(tensor, name):
+          self.ttv.appendln(ln)
+
+      self.ttv.appendln("\nString:", self.ttv.TAG_SECTION)
+      obs_string = self.observation.string_from(state,
+                                                player=observer_as_player)
+      if obs_string:
+        self.ttv.append(obs_string)
+      else:
+        self.ttv.append("(empty)", self.ttv.TAG_NOTE)
     else:
-      self.ttv.append("(empty)", self.ttv.TAG_NOTE)
+      self.ttv.appendln("Observation is not available:", self.ttv.TAG_NOTE)
+      self.ttv.appendln(
+          f"Current player is {player_to_str(observer_as_player)}",
+          self.ttv.TAG_NOTE)
