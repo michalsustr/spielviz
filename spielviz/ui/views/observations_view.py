@@ -84,10 +84,17 @@ class ObservationsView:
     self.player = player
     observation_type = pyspiel.IIGObservationType(
         public_info, perfect_recall, private_info)
-    self.observation = make_observation(game, observation_type)
+    try:
+      self.observation = make_observation(game, observation_type)
+    except RuntimeError:
+      self.observation = None
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
+    if self.observation is None:
+      self.ttv.appendln("Requested Observer type not available.",
+                        self.ttv.TAG_NOTE)
+      return
 
     observer_as_player = state.current_player() \
       if self.player is None else self.player
