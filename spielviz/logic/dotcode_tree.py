@@ -116,15 +116,14 @@ class GameTreeViz(pygraphviz.AGraph):
 
     if state.is_terminal():
       attrs["label"] = ", ".join(map(str, state.returns()))
-      attrs["shape"] = "diamond"
-      attrs["color"] = cfg.TERMINAL_COLOR
+      attrs["shape"] = cfg.PLAYER_SHAPES[pyspiel.PlayerId.TERMINAL]
+      attrs["color"] = cfg.PLAYER_COLORS[pyspiel.PlayerId.TERMINAL]
     elif state.is_chance_node():
-      attrs["shape"] = "circle"
       attrs["width"] = cfg.PLOT_WIDTH / 2.
       attrs["height"] = cfg.PLOT_HEIGHT / 2.
-      attrs["color"] = cfg.CHANCE_COLOR
+      attrs["shape"] = cfg.PLAYER_SHAPES[pyspiel.PlayerId.CHANCE]
+      attrs["color"] = cfg.PLAYER_COLORS[pyspiel.PlayerId.CHANCE]
     else:
-      # attrs["label"] = str(state.information_state_string())
       attrs["shape"] = cfg.PLAYER_SHAPES.get(player, "square")
       attrs["color"] = cfg.PLAYER_COLORS.get(player, "black")
 

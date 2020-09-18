@@ -9,6 +9,8 @@ import importlib.util
 import logging
 import os
 
+import pyspiel
+
 
 class UserConfig:
   """
@@ -78,11 +80,11 @@ PLOT_HIGHLIGHT_PENWIDTH = user_cfg.PLOT_HIGHLIGHT_PENWIDTH or 4
 HIGHLIGHT_COLOR = user_cfg.HIGHLIGHT_COLOR or (.8, .8, .1, 1)
 
 # [Players]
-INVALID_PLAYER_COLOR = user_cfg.INVALID_PLAYER_COLOR or "#dddddd"  # gray
-CHANCE_COLOR = user_cfg.CHANCE_COLOR or "#800080"  # purple
-TERMINAL_COLOR = user_cfg.TERMINAL_COLOR or "#000000"  # black
-SIMULTANEOUS_PLAYER_COLOR = user_cfg.SIMULTANEOUS_PLAYER_COLOR or "#F0FFFF"  # azure
 PLAYER_COLORS = user_cfg.PLAYER_COLORS or {
+  pyspiel.PlayerId.INVALID: "#dddddd",  # gray
+  pyspiel.PlayerId.CHANCE: "#800080",  # purple
+  pyspiel.PlayerId.TERMINAL: "#000000",  # black
+  pyspiel.PlayerId.SIMULTANEOUS: "#008000",  # lime
   0: "#FF0000",  # red
   1: "#0000FF",  # blue
   2: "#008000",  # green
@@ -100,8 +102,12 @@ PLAYER_COLORS = user_cfg.PLAYER_COLORS or {
   # just add more colors here.
 }
 PLAYER_SHAPES = user_cfg.PLAYER_COLORS or {
+  pyspiel.PlayerId.INVALID: "box",
+  pyspiel.PlayerId.CHANCE: "circle",
+  pyspiel.PlayerId.TERMINAL: "diamond",
+  pyspiel.PlayerId.SIMULTANEOUS: "square",
   0: "square",
-  1: "square"
+  1: "square",
 }
 
 # [Show options]

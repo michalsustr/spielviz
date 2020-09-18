@@ -24,13 +24,13 @@ class TaggedTextView:
       for p, color in cfg.PLAYER_COLORS.items()
     ]
     self.TAG_INVALID = self.textbuffer.create_tag(
-        "inv", foreground=cfg.INVALID_PLAYER_COLOR)
+        "inv", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.INVALID])
     self.TAG_TERMINAL = self.textbuffer.create_tag(
-        "ter", foreground=cfg.TERMINAL_COLOR)
+        "ter", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.TERMINAL])
     self.TAG_CHANCE = self.textbuffer.create_tag(
-        "chn", foreground=cfg.CHANCE_COLOR)
+        "chn", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.CHANCE])
     self.TAG_SIMULTANEOUS = self.textbuffer.create_tag(
-        "sim", foreground=cfg.SIMULTANEOUS_PLAYER_COLOR)
+        "sim", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.SIMULTANEOUS])
 
   def append(self, text: str, *tags):
     if tags:
