@@ -36,9 +36,11 @@ class GameInformationView:
     self.ttv.append("Min players: ", self.ttv.TAG_SECTION)
     self.ttv.appendln(str(type.min_num_players))
     self.ttv.append("Game parameters: ", self.ttv.TAG_SECTION)
-    for name, param in type.parameter_specification.items():
-      self.ttv.append(f"\n - {name}: {param}")
-      if param.is_mandatory():
+    params = game.get_parameters()
+    for name, default_param in type.parameter_specification.items():
+      self.ttv.append(f"\n - {name}: {params[name]} ")
+      self.ttv.append(f"(default {default_param}) ", self.ttv.TAG_NOTE)
+      if default_param.is_mandatory():
         self.ttv.append(f"(mandatory)", self.ttv.TAG_NOTE)
 
     self.ttv.append("\n\n")
