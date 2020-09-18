@@ -15,15 +15,36 @@ class HistoryView:
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
-    self.ttv.append("Move number: ", self.ttv.TAG_SECTION)
-    self.ttv.append(str(state.move_number()))
-
     if state.is_initial_state():
-      self.ttv.append("\nThis is the initial state.", self.ttv.TAG_NOTE)
+      self.ttv.append("This is the initial state.", self.ttv.TAG_NOTE)
+      return
 
     game = state.get_game()
     rollout = game.new_initial_state()
-    for action in state.history():
-      self.ttv.append_pl(f"\n{action}: {rollout.action_to_string(action)}",
+    num_players = game.num_players()
+    history = state.history()
+    i = 0
+    move_num = 0
+    while i < len(history):
+      if rollout.is_simultaneous_node():
+        move_str = f"move={move_num}  "
+        for p in range(num_players):
+          action = history[i+p]
+          action_descr = rollout.action_to_string(p, action)
+          self.ttv.append(move_str if p == 0 else " " * len(move_str),
+                          self.ttv.TAG_SIMULTANEOUS)
+          self.ttv.append_pl(f"action={action}  "
+                             f"str={action_descr}\n", p)
+        rollout.apply_actions(history[i:i+num_players])
+        i += num_players
+        move_num += 1
+      else:
+        action = history[i]
+        action_descr = rollout.action_to_string(action)
+        self.ttv.append_pl(f"move={move_num}  "
+                           f"action={action}  "
+                           f"str={action_descr}\n",
                            rollout.current_player())
-      rollout.apply_action(action)
+        rollout.apply_action(history[i])
+        i += 1
+        move_num += 1

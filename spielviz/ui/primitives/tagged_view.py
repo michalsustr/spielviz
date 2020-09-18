@@ -21,7 +21,7 @@ class TaggedTextView:
         "b", weight=Pango.Weight.BOLD)
     self.TAG_PLAYER = [
       self.textbuffer.create_tag(f"p{p}", foreground=color)
-      for p, color in cfg.PLAYER_COLORS.items()
+      for p, color in cfg.PLAYER_COLORS.items() if int(p) >= 0
     ]
     self.TAG_INVALID = self.textbuffer.create_tag(
         "inv", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.INVALID])

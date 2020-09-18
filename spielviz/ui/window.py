@@ -126,12 +126,14 @@ class MainWindow:
 
     self.lookahead = cfg.LOOKAHEAD
     self.lookahead_spinner = create_spin_button(
-        builder.get_object("lookahead"), value=self.lookahead, lower=1, upper=5)
+        builder.get_object("lookahead"), value=self.lookahead,
+        lower=1, upper=5)
     self.lookahead_spinner.connect("value-changed", self.update_lookahead)
 
     self.lookbehind = cfg.LOOKBEHIND
     self.lookbehind_spinner = create_spin_button(
-        builder.get_object("lookbehind"), lower=self.lookbehind, upper=100)
+        builder.get_object("lookbehind"), value=self.lookbehind,
+        lower=1, upper=100)
     self.lookbehind_spinner.connect("value-changed", self.update_lookbehind)
 
     self.show_full_tree = cfg.FULL_TREE

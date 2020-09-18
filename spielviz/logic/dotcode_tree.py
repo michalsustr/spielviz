@@ -1,8 +1,8 @@
 import pygraphviz
 import pyspiel
-
+import itertools
 import spielviz.config as cfg
-from spielviz.logic.state_history import state_from_history
+from spielviz.logic.state_history import state_from_history, state_undo_n_moves
 
 
 class GameTreeViz(pygraphviz.AGraph):
@@ -28,8 +28,7 @@ class GameTreeViz(pygraphviz.AGraph):
                                        self.state)
     else:
       if self.lookbehind:
-        start_from = state_from_history(self.game,
-                                        self.state.history()[:-self.lookbehind])
+        start_from = state_undo_n_moves(self.state, self.lookbehind)
         self.add_node(self.state_to_str(start_from),
                       **self._node_decorator(start_from))
         yield from self._build_lookbehind(start_from, self.state)
@@ -39,10 +38,26 @@ class GameTreeViz(pygraphviz.AGraph):
                   **self._node_decorator(self.state, highlight_node=True))
     yield self.state
 
-  def state_to_str(self, state):
-    assert not state.is_simultaneous_node()
+  def state_to_str(self, state: pyspiel.State):
     # AGraph nodes can't have empty string == None as a key, thus we prepend " "
     return " " + state.history_str()
+
+  def _children_generator(self, state: pyspiel.State):
+    if state.is_player_node() or state.is_chance_node():
+      for action in state.legal_actions():
+        child = state.child(action)
+        yield child, [action]
+    elif state.is_simultaneous_node():
+      player_actions = [state.legal_actions(p)
+                        for p in range(state.num_players())]
+      for actions in itertools.product(*player_actions):
+        child = state.clone()
+        child.apply_actions(actions)
+        yield child, list(actions)
+    elif state.is_terminal():
+      return
+    else:
+      raise RuntimeError(f"Unhandled type of state! {str(state)}")
 
   def _build_full_tree(self, start_from_state, arrive_to_state):
     start_hist = start_from_state.history()
@@ -51,17 +66,18 @@ class GameTreeViz(pygraphviz.AGraph):
         len(start_hist) < len(arrive_hist)
         and arrive_hist[:len(start_hist)] == start_hist)
     state_str = self.state_to_str(start_from_state)
+    len_sh = len(start_hist)
 
-    for action in start_from_state.legal_actions():
-      child = start_from_state.child(action)
+    for child, actions in self._children_generator(start_from_state):
       child_str = self.state_to_str(child)
 
       edge_lies_on_trajectory = (
-          state_lies_on_trajectory and arrive_hist[len(start_hist)] == action)
+          state_lies_on_trajectory
+          and arrive_hist[len_sh:len_sh+len(actions)] == actions)
 
       self.add_node(child_str, **self._node_decorator(child))
       self.add_edge(state_str, child_str, **self._edge_decorator(
-          start_from_state, action, highlight_edge=edge_lies_on_trajectory))
+          start_from_state, actions, highlight_edge=edge_lies_on_trajectory))
 
       yield child
       yield from self._build_full_tree(child, arrive_to_state)
@@ -73,15 +89,15 @@ class GameTreeViz(pygraphviz.AGraph):
       return
 
     state_str = self.state_to_str(start_from_state)
-    for action in start_from_state.legal_actions():
-      child = start_from_state.child(action)
+    len_sh = len(start_hist)
+    for child, actions in self._children_generator(start_from_state):
       child_str = self.state_to_str(child)
 
-      lies_on_trajectory = arrive_hist[len(start_hist)] == action
+      lies_on_trajectory = arrive_hist[len_sh:len_sh+len(actions)] == actions
 
       self.add_node(child_str, **self._node_decorator(child))
       self.add_edge(state_str, child_str, **self._edge_decorator(
-          start_from_state, action, highlight_edge=lies_on_trajectory))
+          start_from_state, actions, highlight_edge=lies_on_trajectory))
 
       yield child
       if lies_on_trajectory:
@@ -95,14 +111,12 @@ class GameTreeViz(pygraphviz.AGraph):
     if depth >= lookahead >= 0:
       return
 
-    for action in state.legal_actions():
-      child = state.child(action)
+    for child, actions in self._children_generator(state):
       child_str = self.state_to_str(child)
       self.add_node(child_str, **self._node_decorator(child))
-      self.add_edge(state_str, child_str, **self._edge_decorator(state, action))
+      self.add_edge(state_str, child_str, **self._edge_decorator(state, actions))
       yield child
-      for node in self._build_lookahead(child, depth + 1, lookahead):
-        yield child
+      yield from self._build_lookahead(child, depth + 1, lookahead)
 
   def _node_decorator(self, state, highlight_node=False):
     player = state.current_player()
@@ -131,10 +145,15 @@ class GameTreeViz(pygraphviz.AGraph):
       attrs["penwidth"] = cfg.PLOT_HIGHLIGHT_PENWIDTH
     return attrs
 
-  def _edge_decorator(self, parent, action, highlight_edge=False):
+  def _edge_decorator(self, parent, actions, highlight_edge=False):
     player = parent.current_player()
+    if len(actions) == 1:
+      label = parent.action_to_string(player, actions[0])
+    else:
+      label = "\n ".join([parent.action_to_string(p, action)
+                         for p, action in enumerate(actions)])
     attrs = dict(
-        label=" " + parent.action_to_string(player, action),
+        label=" " + label,
         fontsize=cfg.PLOT_FONTSIZE,
         arrowsize=cfg.PLOT_ARROWSIZE,
     )
