@@ -152,6 +152,12 @@ class GameTreeViz(pygraphviz.AGraph):
     else:
       label = "\n ".join([parent.action_to_string(p, action)
                          for p, action in enumerate(actions)])
+    if parent.is_chance_node():
+      assert len(actions) == 1
+      prob = [p for action, p in parent.chance_outcomes()
+              if action == actions[0]]
+      # todo: format as a note
+      label += f"\n (p={prob[0]:.2f})"
     attrs = dict(
         label=" " + label,
         fontsize=cfg.PLOT_FONTSIZE,

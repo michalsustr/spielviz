@@ -43,8 +43,12 @@ class HistoryView:
         action_descr = rollout.action_to_string(action)
         self.ttv.append_pl(f"move={move_num}  "
                            f"action={action}  "
-                           f"str={action_descr}\n",
+                           f"str={action_descr}  ",
                            rollout.current_player())
+        if rollout.is_chance_node():
+          prob = [p for a, p in rollout.chance_outcomes() if a == action][0]
+          self.ttv.append_pl(f"prob={prob:.4f}", rollout.current_player())
+        self.ttv.append("\n")
         rollout.apply_action(history[i])
         i += 1
         move_num += 1
