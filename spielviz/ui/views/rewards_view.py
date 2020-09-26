@@ -1,7 +1,7 @@
 import pyspiel
 from gi.repository import Gtk
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.primitives.tagged_view import *
 
 
 class RewardsView:
@@ -17,7 +17,7 @@ class RewardsView:
     if not state.is_chance_node():
       self.ttv.append_player_list(state.rewards())
     else:
-      self.ttv.append("(not available)", self.ttv.TAG_NOTE)
+      self.ttv.append("(not available)", TAG_NOTE)
 
     min_util = state.get_game().min_utility()
     max_util = state.get_game().max_utility()

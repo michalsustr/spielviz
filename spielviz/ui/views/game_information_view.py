@@ -1,8 +1,7 @@
 import pyspiel
 from gi.repository import Gtk
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
-
+from spielviz.ui.primitives.tagged_view import *
 
 class GameInformationView:
   """
@@ -18,12 +17,12 @@ class GameInformationView:
 
     def append_type(label, s):
       key, val = s.split(".")
-      self.ttv.append(label + ": ", self.ttv.TAG_SECTION)
+      self.ttv.append(label + ": ", TAG_SECTION)
       self.ttv.appendln(val)
 
-    self.ttv.append("Short name: ", self.ttv.TAG_SECTION)
+    self.ttv.append("Short name: ", TAG_SECTION)
     self.ttv.appendln(str(type.short_name))
-    self.ttv.append("Long name: ", self.ttv.TAG_SECTION)
+    self.ttv.append("Long name: ", TAG_SECTION)
     self.ttv.appendln(str(type.long_name))
     append_type("Dynamics", str(type.dynamics))
     append_type("Chance mode", str(type.chance_mode))
@@ -31,27 +30,27 @@ class GameInformationView:
     append_type("Utility", str(type.utility))
     append_type("Reward model", str(type.reward_model))
 
-    self.ttv.append("Max players: ", self.ttv.TAG_SECTION)
+    self.ttv.append("Max players: ", TAG_SECTION)
     self.ttv.appendln(str(type.max_num_players))
-    self.ttv.append("Min players: ", self.ttv.TAG_SECTION)
+    self.ttv.append("Min players: ", TAG_SECTION)
     self.ttv.appendln(str(type.min_num_players))
-    self.ttv.append("Game parameters: ", self.ttv.TAG_SECTION)
+    self.ttv.append("Game parameters: ", TAG_SECTION)
     params = game.get_parameters()
     for name, default_param in type.parameter_specification.items():
       self.ttv.append(f"\n - {name}: {params[name]} ")
-      self.ttv.append(f"(default {default_param}) ", self.ttv.TAG_NOTE)
+      self.ttv.append(f"(default {default_param}) ", TAG_NOTE)
       if default_param.is_mandatory():
-        self.ttv.append(f"(mandatory)", self.ttv.TAG_NOTE)
+        self.ttv.append(f"(mandatory)", TAG_NOTE)
 
     self.ttv.append("\n\n")
     self.ttv.append("")
 
     def append_optional(label, callback):
-      self.ttv.append(label, self.ttv.TAG_SECTION)
+      self.ttv.append(label, TAG_SECTION)
       try:
         self.ttv.appendln(str(callback()))
       except RuntimeError:
-        self.ttv.appendln("(not available)", self.ttv.TAG_NOTE)
+        self.ttv.appendln("(not available)", TAG_NOTE)
 
     append_optional("Max chance outcomes: ", game.max_chance_outcomes)
     append_optional("Num distinct actions: ", game.num_distinct_actions)

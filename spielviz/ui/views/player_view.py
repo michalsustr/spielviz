@@ -1,7 +1,7 @@
 import pyspiel
 from gi.repository import Gtk
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.primitives.tagged_view import *
 from spielviz.ui.utils import player_to_str
 
 

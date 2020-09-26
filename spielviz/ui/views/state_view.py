@@ -1,7 +1,7 @@
 import pyspiel
 from gi.repository import Gtk
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.primitives.tagged_view import *
 
 
 class StateView:

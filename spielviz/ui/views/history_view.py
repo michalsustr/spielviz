@@ -1,7 +1,7 @@
 import pyspiel
 from gi.repository import Gtk
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.primitives.tagged_view import *
 
 
 class HistoryView:
@@ -16,7 +16,7 @@ class HistoryView:
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
     if state.is_initial_state():
-      self.ttv.append("This is the initial state.", self.ttv.TAG_NOTE)
+      self.ttv.append("This is the initial state.", TAG_NOTE)
       return
 
     game = state.get_game()
@@ -32,7 +32,7 @@ class HistoryView:
           action = history[i+p]
           action_descr = rollout.action_to_string(p, action)
           self.ttv.append(move_str if p == 0 else " " * len(move_str),
-                          self.ttv.TAG_SIMULTANEOUS)
+                          TAG_PLAYER[pyspiel.PlayerId.SIMULTANEOUS])
           self.ttv.append_pl(f"action={action}  "
                              f"str={action_descr}\n", p)
         rollout.apply_actions(history[i:i+num_players])

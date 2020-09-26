@@ -5,8 +5,7 @@ from spielviz.ui.games.kuhn_poker import KuhnStateView
 from spielviz.ui.views.state_view import StateView
 
 _custom_views = dict(
-    # todo: enable when ready
-    # kuhn_poker=("spielviz.ui.games.kuhn_poker", "KuhnStateView")
+    kuhn_poker=("spielviz.ui.games.kuhn_poker", "KuhnStateView")
 )
 
 

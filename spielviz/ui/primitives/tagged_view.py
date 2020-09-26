@@ -3,6 +3,23 @@ import pyspiel
 from gi.repository import Gtk, Pango
 from typing import List
 
+
+_TAG_TABLE = Gtk.TextTagTable()
+
+TAG_SECTION = Gtk.TextTag(name="section")
+TAG_SECTION.set_property("weight", Pango.Weight.BOLD)
+_TAG_TABLE.add(TAG_SECTION)
+
+TAG_NOTE = Gtk.TextTag(name="note")
+TAG_NOTE.set_property("foreground", "#999999")
+_TAG_TABLE.add(TAG_NOTE)
+
+TAG_PLAYER = dict()
+for p, color in cfg.PLAYER_COLORS.items():
+  TAG_PLAYER[p] = Gtk.TextTag(name=f"pl_{p}")
+  TAG_PLAYER[p].set_property("foreground", color)
+  _TAG_TABLE.add(TAG_PLAYER[p])
+
 class TaggedTextView:
   """
   An object that allows to tag text in game-specific way within
@@ -11,26 +28,9 @@ class TaggedTextView:
 
   def __init__(self, container: Gtk.TextView):
     self.container = container
-    self.textbuffer = Gtk.TextBuffer()
+    self.textbuffer = Gtk.TextBuffer.new(table=_TAG_TABLE)
     self.textbuffer.set_text("")
     self.container.set_buffer(self.textbuffer)
-
-    self.TAG_NOTE = self.textbuffer.create_tag(
-        "n", foreground="#999999")
-    self.TAG_SECTION = self.textbuffer.create_tag(
-        "b", weight=Pango.Weight.BOLD)
-    self.TAG_PLAYER = [
-      self.textbuffer.create_tag(f"p{p}", foreground=color)
-      for p, color in cfg.PLAYER_COLORS.items() if int(p) >= 0
-    ]
-    self.TAG_INVALID = self.textbuffer.create_tag(
-        "inv", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.INVALID])
-    self.TAG_TERMINAL = self.textbuffer.create_tag(
-        "ter", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.TERMINAL])
-    self.TAG_CHANCE = self.textbuffer.create_tag(
-        "chn", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.CHANCE])
-    self.TAG_SIMULTANEOUS = self.textbuffer.create_tag(
-        "sim", foreground=cfg.PLAYER_COLORS[pyspiel.PlayerId.SIMULTANEOUS])
 
   def append(self, text: str, *tags):
     if tags:
@@ -43,10 +43,10 @@ class TaggedTextView:
     self.append(text + "\n", *tags)
 
   def appendln_pl(self, text: str, player: int):
-    self.appendln(text, self.player_tag(player))
+    self.appendln(text, TAG_PLAYER[player])
 
   def append_pl(self, text: str, player: int):
-    self.append(text, self.player_tag(player))
+    self.append(text, TAG_PLAYER[player])
 
   def append_player_list(self, item_per_player: List[str], join_str=", "):
     for pl, item in enumerate(item_per_player):
@@ -54,19 +54,11 @@ class TaggedTextView:
         self.append(join_str)
       self.append_pl(str(item), pl)
 
-  def player_tag(self, player: int):
-    if player >= 0:
-      return self.TAG_PLAYER[player]
-    elif player == pyspiel.PlayerId.INVALID:
-      return self.TAG_INVALID
-    elif player == pyspiel.PlayerId.TERMINAL:
-      return self.TAG_TERMINAL
-    elif player == pyspiel.PlayerId.CHANCE:
-      return self.TAG_CHANCE
-    elif player == pyspiel.PlayerId.SIMULTANEOUS:
-      return self.TAG_SIMULTANEOUS
-    else:
-      raise AttributeError(f"Player not found: {player}")
-
   def clear_text(self):
     self.textbuffer.set_text("")
+
+
+__all__ = ["TaggedTextView",
+           "TAG_SECTION",
+           "TAG_NOTE",
+           "TAG_PLAYER"]

@@ -3,7 +3,7 @@ import pyspiel
 from gi.repository import Gtk
 from open_spiel.python.observation import make_observation
 
-from spielviz.ui.primitives.tagged_view import TaggedTextView
+from spielviz.ui.primitives.tagged_view import *
 from spielviz.ui.utils import player_to_str
 
 
@@ -93,7 +93,7 @@ class ObservationsView:
     self.ttv.clear_text()
     if self.observation is None:
       self.ttv.appendln("Requested Observer type not available.",
-                        self.ttv.TAG_NOTE)
+                        TAG_NOTE)
       return
 
     observer_as_player = state.current_player() \
@@ -102,20 +102,20 @@ class ObservationsView:
     if 0 <= observer_as_player < state.get_game().num_players():
       self.observation.set_from(state, player=observer_as_player)
 
-      self.ttv.appendln("Tensor:", self.ttv.TAG_SECTION)
+      self.ttv.appendln("Tensor:", TAG_SECTION)
       for name, tensor in self.observation.dict.items():
         for ln in _format_tensor(tensor, name):
           self.ttv.appendln(ln)
 
-      self.ttv.appendln("\nString:", self.ttv.TAG_SECTION)
+      self.ttv.appendln("\nString:", TAG_SECTION)
       obs_string = self.observation.string_from(state,
                                                 player=observer_as_player)
       if obs_string:
         self.ttv.append(obs_string)
       else:
-        self.ttv.append("(empty)", self.ttv.TAG_NOTE)
+        self.ttv.append("(empty)", TAG_NOTE)
     else:
-      self.ttv.appendln("Observation is not available:", self.ttv.TAG_NOTE)
+      self.ttv.appendln("Observation is not available:", TAG_NOTE)
       self.ttv.appendln(
           f"Current player is {player_to_str(observer_as_player)}",
-          self.ttv.TAG_NOTE)
+          TAG_NOTE)
