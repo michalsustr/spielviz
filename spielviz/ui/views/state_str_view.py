@@ -12,4 +12,4 @@ class StateStrView:
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
     self.ttv.appendln("State to string:", TAG_SECTION)
-    self.ttv.appendln(str(state))
+    self.ttv.append(str(state))
