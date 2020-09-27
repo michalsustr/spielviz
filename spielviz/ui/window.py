@@ -21,10 +21,11 @@ from spielviz.ui.views.observations_view import ObservationsView
 from spielviz.ui.views.observing_player_view import ObservingPlayerView
 from spielviz.ui.views.player_view import PlayerView
 from spielviz.ui.views.rewards_view import RewardsView
-from spielviz.ui.views.state_view import StateView, StringStateView
+from spielviz.ui.views.state_str_view import StateStrView
+from spielviz.ui.views.state_view import StateView, NoStateViewImplemented
 
 BASE_TITLE = 'SpielViz'
-UI_FILE = get_resource_path("definition.xml")
+UI_FILE = get_resource_path("window_definition.xml")
 CSS_FILE = get_resource_path("style.css")
 ICON_FILE = get_resource_path("game_512x512.png")
 
@@ -34,7 +35,7 @@ def create_state_view(game: pyspiel.Game,
   if is_custom_view_registed(game):
     return create_custom_state_view(game, container)
   else:
-    return StringStateView(game, container)
+    return NoStateViewImplemented(game, container)
 
 
 def create_game_selector(item: Gtk.ToolItem):
@@ -82,6 +83,7 @@ class MainWindow:
     self.plot_area.connect("change_history", self.change_history)
     self.state_view_container = builder.get_object("state_view")
 
+    self.state_str_view = StateStrView(builder.get_object("state_str_view"))
     self.history_view = HistoryView(builder.get_object("history"))
 
     self.game_information_view = GameInformationView(
@@ -92,10 +94,12 @@ class MainWindow:
     self.rewards_view = RewardsView(builder.get_object("rewards"))
 
     self.observation_private_info = pyspiel.PrivateInfoType.NONE
-    self.observations_view = ObservationsView(builder.get_object("observations"))
+    self.observations_view = ObservationsView(
+      builder.get_object("observations"))
     self.observing_player_combo = builder.get_object("observing_player")
     self.observing_player_combo.connect("changed", self.change_observing_player)
-    self.observing_player_view = ObservingPlayerView(self.observing_player_combo)
+    self.observing_player_view = ObservingPlayerView(
+      self.observing_player_combo)
     self.observing_player = cfg.OBSERVING_PLAYER
 
     self.show_public_info = True
@@ -274,6 +278,7 @@ class MainWindow:
 
       self.history_view.update(state)
       self.state_view.update(state)
+      self.state_str_view.update(state)
       self.player_view.update(state)
       self.rewards_view.update(state)
       self.observations_view.update(state)

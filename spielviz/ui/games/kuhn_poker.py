@@ -2,10 +2,10 @@ import pyspiel
 from gi.repository import Gtk
 
 from spielviz.ui.primitives.tagged_view import *
-from spielviz.ui.views.state_view import StringStateView
+from spielviz.ui.views.state_view import TextStateView
 
 
-class KuhnStateView(StringStateView):
+class KuhnStateView(TextStateView):
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
     super().__init__(game, container)
     self.game = game

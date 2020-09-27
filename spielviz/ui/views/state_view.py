@@ -11,21 +11,27 @@ class StateView:
   The list of game-specific UIs is in ui/games/
   """
 
-  def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
+  def __init__(self, game: pyspiel.Game, container: Gtk.Frame):
     self.game = game
     self.container = container
 
   def update(self, state: pyspiel.State):
     raise NotImplementedError
 
+  def _add_single_child(self, child):
+    maybe_child = self.container.get_child()
+    if maybe_child:
+      self.container.remove(maybe_child)
+    self.container.add(child)
 
-class StringStateView(StateView):
+
+class TextStateView(StateView):
   """
   Render current pyspiel.State within scrolled window container
   as a string representation of the State within a TextView.
   """
 
-  def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
+  def __init__(self, game: pyspiel.Game, container: Gtk.Frame):
     StateView.__init__(self, game, container)
     text_view = Gtk.TextView()
     text_view.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -37,12 +43,8 @@ class StringStateView(StateView):
     text_view.set_accepts_tab(False)
     text_view.set_editable(False)
     text_view.set_monospace(True)
-
-    maybe_child = container.get_child()
-    if maybe_child:
-      container.remove(maybe_child)
-    container.add(text_view)
     self.ttv = TaggedTextView(text_view)
+    self._add_single_child(text_view)
     container.show_all()
 
   def update(self, state: pyspiel.State):
@@ -54,11 +56,20 @@ class StringStateView(StateView):
       self.ttv.append(f"(empty state string)")
 
 
+class NoStateViewImplemented(TextStateView):
+  def __init__(self, game: pyspiel.Game, container: Gtk.Frame):
+    TextStateView.__init__(self, game, container)
+    self.ttv.append(f"(no special view available)")
+
+  def update(self, state: pyspiel.State):
+    pass
+
+
 class ImageStateView(StateView):
 
-  def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
+  def __init__(self, game: pyspiel.Game, container: Gtk.Frame):
     StateView.__init__(self, game, container)
     self.game = game
     self.image = Gtk.Image()
-    container.add(self.image)
+    self._add_single_child(self.image)
     container.show_all()
