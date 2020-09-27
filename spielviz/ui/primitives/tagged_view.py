@@ -1,8 +1,8 @@
-import spielviz.config as cfg
-import pyspiel
-from gi.repository import Gtk, Pango
 from typing import List
 
+from gi.repository import Gtk, Pango
+
+import spielviz.config as cfg
 
 _TAG_TABLE = Gtk.TextTagTable()
 
@@ -19,6 +19,7 @@ for p, color in cfg.PLAYER_COLORS.items():
   TAG_PLAYER[p] = Gtk.TextTag(name=f"pl_{p}")
   TAG_PLAYER[p].set_property("foreground", color)
   _TAG_TABLE.add(TAG_PLAYER[p])
+
 
 class TaggedTextView:
   """

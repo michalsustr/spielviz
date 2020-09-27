@@ -1,7 +1,9 @@
 import pyspiel
 from gi.repository import Gtk
-from spielviz.ui.views.state_view import StringStateView, StateView
+
 from spielviz.ui.primitives.tagged_view import *
+from spielviz.ui.views.state_view import StringStateView
+
 
 class KuhnStateView(StringStateView):
   def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
@@ -9,8 +11,12 @@ class KuhnStateView(StringStateView):
     self.game = game
     assert game.get_type().short_name == "kuhn_poker"
 
-  def update(self, state: pyspiel.State):
+  def update(self, state: pyspiel.kuhn_poker.KuhnState):
     self.ttv.clear_text()
-    self.ttv.appendln(f"Player cards:", TAG_SECTION)
-    for pl, card in enumerate([0, 1]):
-      self.ttv.appendln(f"PL{pl}: {card}", TAG_PLAYER[pl])
+    self.ttv.appendln(f"Card dealing:", TAG_SECTION)
+    for card, pl in enumerate(state.card_dealt()):
+      self.ttv.append(f"Card {card}: ")
+      if pl >= 0:
+        self.ttv.append_pl(f"PL{pl}\n", pl)
+      else:
+        self.ttv.appendln("(no one)", TAG_NOTE)

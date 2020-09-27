@@ -52,3 +52,13 @@ class StringStateView(StateView):
       self.ttv.append(state_str)
     else:
       self.ttv.append(f"(empty state string)")
+
+
+class ImageStateView(StateView):
+
+  def __init__(self, game: pyspiel.Game, container: Gtk.ScrolledWindow):
+    StateView.__init__(self, game, container)
+    self.game = game
+    self.image = Gtk.Image()
+    container.add(self.image)
+    container.show_all()
