@@ -71,5 +71,6 @@ class ImageStateView(StateView):
     StateView.__init__(self, game, container)
     self.game = game
     self.image = Gtk.Image()
+    self.image.set_halign(Gtk.Align.START)
     self._add_single_child(self.image)
     container.show_all()
