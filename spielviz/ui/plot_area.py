@@ -1,19 +1,18 @@
+import logging
 import math
-import os
-import subprocess
-import sys
 import time
-from typing import List, Optional, Set, Tuple, Type
+from typing import Optional, Set, Tuple, Type
 
+import pyspiel
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
-from gi.repository import GLib, GObject, Gdk, Gtk
+from gi.repository import GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
-import pyspiel
 
-from spielviz.dot.lexer import ParseError
-from spielviz.dot.parser import XDotParser
+import spielviz.config as cfg
+from spielviz.dot.parser import make_graph, make_xdotcode
 from spielviz.graphics.elements import Graph, Node, Element
+from spielviz.logic.dotcode_tree import GameTreeViz
 from spielviz.ui import actions, animation
 
 
@@ -58,8 +57,19 @@ class PlotArea(GObject.GObject):
     self.gui_history_back = []
     self.gui_history_forward = []
 
-  def set_graph(self, graph: Graph) -> None:
-    self.graph = graph
+  def update(self, state: pyspiel.State, **kwargs):
+    gametree = GameTreeViz(state=state, **kwargs)
+    count = 0
+    for _ in gametree.build_tree():
+      if count >= cfg.TREE_MAX_NODES:
+        logging.warning("There are too many nodes in the tree. "
+                        f"Showing only {count} of them.")
+        break
+      count += 1
+
+    dotcode = gametree.to_string().encode()
+    xdotcode = make_xdotcode(dotcode)
+    self.graph = make_graph(xdotcode)
 
   def show_all(self):
     self.zoom_to_fit()

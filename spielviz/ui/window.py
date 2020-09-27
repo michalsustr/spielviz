@@ -6,8 +6,6 @@ import pyspiel
 from gi.repository import Gtk, Gdk, GObject
 
 import spielviz.config as cfg
-from spielviz.dot.parser import make_graph, make_xdotcode
-from spielviz.logic.dotcode_tree import GameTreeViz
 from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.state_history import state_from_history_str
 from spielviz.resources import get_resource_path
@@ -95,11 +93,11 @@ class MainWindow:
 
     self.observation_private_info = pyspiel.PrivateInfoType.NONE
     self.observations_view = ObservationsView(
-      builder.get_object("observations"))
+        builder.get_object("observations"))
     self.observing_player_combo = builder.get_object("observing_player")
     self.observing_player_combo.connect("changed", self.change_observing_player)
     self.observing_player_view = ObservingPlayerView(
-      self.observing_player_combo)
+        self.observing_player_combo)
     self.observing_player = cfg.OBSERVING_PLAYER
 
     self.show_public_info = True
@@ -164,31 +162,11 @@ class MainWindow:
     else:
       self.observing_player = observing_player - 1
     self.update_observer()
-    self.set_state(self.state)
-
-  def toggle_full_tree(self, button: Gtk.CheckButton):
-    do_show = button.get_active()
-    if do_show:
-      self.show_full_tree = True
-      self.lookbehind_spinner.set_sensitive(False)
-      self.lookahead_spinner.set_sensitive(False)
-    else:
-      self.show_full_tree = False
-      self.lookbehind_spinner.set_sensitive(True)
-      self.lookahead_spinner.set_sensitive(True)
-    self.set_state(self.state)
 
   def toggle_public_info(self, button: Gtk.CheckButton):
     do_show = button.get_active()
     self.show_public_info = do_show
     self.update_observer()
-    self.set_state(self.state)
-
-  def toggle_perfect_recall(self, button: Gtk.CheckButton):
-    do_show = button.get_active()
-    self.show_perfect_recall = do_show
-    self.update_observer()
-    self.set_state(self.state)
 
   def toggle_private_info(self, button: Gtk.RadioButton):
     active_radio = \
@@ -200,15 +178,31 @@ class MainWindow:
     if active_radio == self.private_info_all:
       self.show_private_info = pyspiel.PrivateInfoType.ALL_PLAYERS
     self.update_observer()
-    self.set_state(self.state)
+
+  def toggle_perfect_recall(self, button: Gtk.CheckButton):
+    do_show = button.get_active()
+    self.show_perfect_recall = do_show
+    self.update_observer()
+
+  def toggle_full_tree(self, button: Gtk.CheckButton):
+    do_show = button.get_active()
+    if do_show:
+      self.show_full_tree = True
+      self.lookbehind_spinner.set_sensitive(False)
+      self.lookahead_spinner.set_sensitive(False)
+    else:
+      self.show_full_tree = False
+      self.lookbehind_spinner.set_sensitive(True)
+      self.lookahead_spinner.set_sensitive(True)
+    self.update_plot_area(self.state)
 
   def update_lookahead(self, button: Gtk.SpinButton):
     self.lookahead = button.get_value_as_int()
-    self.set_state(self.state)
+    self.update_plot_area(self.state)
 
   def update_lookbehind(self, button: Gtk.SpinButton):
     self.lookbehind = button.get_value_as_int()
-    self.set_state(self.state)
+    self.update_plot_area(self.state)
 
   def change_history(self, origin_object: GObject, history_str: str):
     try:
@@ -236,6 +230,7 @@ class MainWindow:
     logging.debug(f"Setting game '{game}'")
     self.window.set_title(f"{BASE_TITLE}: {game}")
     self.game = game
+    self.state = None
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.game_information_view.update(game)
 
@@ -252,6 +247,8 @@ class MainWindow:
     self.observations_view.change_observation(
         self.game, self.observing_player, self.show_public_info,
         self.show_perfect_recall, self.show_private_info)
+    if self.state is not None:
+      self.observations_view.update(self.state)
 
   def set_state(self, state: Optional[pyspiel.State]):
     if state is None:
@@ -259,23 +256,7 @@ class MainWindow:
 
     logging.debug(f"Setting state '{str(state)}'")
     try:
-      gametree = GameTreeViz(state=state,
-                             full_tree=self.show_full_tree,
-                             lookbehind=self.lookbehind,
-                             lookahead=self.lookahead)
-      count = 0
-      for _ in gametree.build_tree():
-        if count >= cfg.TREE_MAX_NODES:
-          self.error_dialog("There are too many nodes in the tree.\n"
-                            f"Showing only {count} of them.")
-          break
-        count += 1
-
-      dotcode = gametree.to_string().encode()
-      xdotcode = make_xdotcode(dotcode)
-      graph = make_graph(xdotcode)
-      self.plot_area.set_graph(graph)
-
+      self.update_plot_area(state)
       self.history_view.update(state)
       self.state_view.update(state)
       self.state_str_view.update(state)
@@ -284,15 +265,15 @@ class MainWindow:
       self.observations_view.update(state)
       self.select_history.update(state)
       self.state = state
-      self.render()
     except pyspiel.SpielError as ex:
       self.error_dialog(str(ex))
       return False
 
-  def render(self):
-    self.state_view_container.show_all()
+  def update_plot_area(self, state: pyspiel.State):
+    self.plot_area.update(state, full_tree=self.show_full_tree,
+                          lookbehind=self.lookbehind,
+                          lookahead=self.lookahead)
     self.plot_area.show_all()
-    pass
 
   def find_text(self, entry_text):
     found_items = []
