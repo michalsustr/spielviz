@@ -100,20 +100,27 @@ class ObservationsView:
       if self.player is None else self.player
 
     if 0 <= observer_as_player < state.get_game().num_players():
-      self.observation.set_from(state, player=observer_as_player)
+      self.ttv.append("Tensor:", TAG_SECTION)
+      try:
+        self.observation.set_from(state, player=observer_as_player)
+        self.ttv.append("\n")
+        for name, tensor in self.observation.dict.items():
+          for ln in _format_tensor(tensor, name):
+            self.ttv.appendln(ln)
+      except RuntimeError:
+        self.ttv.appendln(" (not available)", TAG_NOTE)
 
-      self.ttv.appendln("Tensor:", TAG_SECTION)
-      for name, tensor in self.observation.dict.items():
-        for ln in _format_tensor(tensor, name):
-          self.ttv.appendln(ln)
+      self.ttv.append("\nString:", TAG_SECTION)
+      try:
+        obs_string = self.observation.string_from(
+            state, player=observer_as_player)
 
-      self.ttv.appendln("\nString:", TAG_SECTION)
-      obs_string = self.observation.string_from(state,
-                                                player=observer_as_player)
-      if obs_string:
-        self.ttv.append(obs_string)
-      else:
-        self.ttv.append("(empty)", TAG_NOTE)
+        if obs_string:
+          self.ttv.append("\n" + obs_string)
+        else:
+          self.ttv.append(" (empty)", TAG_NOTE)
+      except RuntimeError:
+        self.ttv.append(" (not available)", TAG_NOTE)
     else:
       self.ttv.appendln("Observation is not available:", TAG_NOTE)
       self.ttv.appendln(
