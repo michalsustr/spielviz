@@ -1,7 +1,6 @@
 import pyspiel
 import importlib
 from gi.repository import Gtk
-from spielviz.ui.games.kuhn_poker import KuhnStateView
 from spielviz.ui.views.state_view import StateView
 
 _custom_views = dict(
