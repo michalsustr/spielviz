@@ -7,7 +7,7 @@ from spielviz.ui.views.state_view import ImageStateView
 
 
 class ChessStateView(ImageStateView):
-  def update(self, state: pyspiel.chess.ChessState):
+  def update(self, state: pyspiel.State):
     fen = str(state)
     board = chess.Board(fen)
     svg = chess.svg.board(board)

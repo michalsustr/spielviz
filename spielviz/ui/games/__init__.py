@@ -4,8 +4,9 @@ from gi.repository import Gtk
 from spielviz.ui.views.state_view import StateView
 
 _custom_views = dict(
-    kuhn_poker=("spielviz.ui.games.kuhn_poker", "KuhnStateView"),
-    chess=("spielviz.ui.games.chess", "ChessStateView")
+    # kuhn_poker=("spielviz.ui.games.kuhn_poker", "KuhnStateView"),
+    chess=("spielviz.ui.games.chess", "ChessStateView"),
+    dark_chess=("spielviz.ui.games.dark_chess", "DarkChessStateView")
 )
 
 

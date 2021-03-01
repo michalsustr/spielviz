@@ -42,6 +42,7 @@ setup(
     install_requires=[
       'coloredlogs',
       'pyspiel',
+      'chess',
       # This is true, but doesn't work realiably
       'gi',
       'gi-cairo'

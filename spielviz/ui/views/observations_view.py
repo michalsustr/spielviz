@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import pyspiel
 from gi.repository import Gtk
@@ -86,8 +87,9 @@ class ObservationsView:
         public_info, perfect_recall, private_info)
     try:
       self.observation = make_observation(game, observation_type)
-    except RuntimeError:
+    except RuntimeError as e:
       self.observation = None
+      logging.warning("Could not make observation: ", e)
 
   def update(self, state: pyspiel.State):
     self.ttv.clear_text()
