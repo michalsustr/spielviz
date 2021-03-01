@@ -6,7 +6,6 @@ import sys
 import coloredlogs
 
 import gi
-
 gi.require_version('Gtk', '3.0')
 gi.require_version('PangoCairo', '1.0')
 
@@ -37,12 +36,16 @@ def main():
       epilog=usage_tips)
   parser.add_argument('game', nargs="?", default=cfg.DEFAULT_GAME,
                       help='game to view [default: %(default)s]')
+  parser.add_argument('--history', default="",
+                      help='action history [default: (empty)]')
   options = parser.parse_args()
 
   coloredlogs.install(level=cfg.LOGGING_LEVEL)
 
   win = MainWindow()
   win.set_game_from_name(options.game)
+  if options.history:
+    win.change_history(None, options.history)
 
   if sys.platform != 'win32':
     # Reset KeyboardInterrupt SIGINT handler,
