@@ -70,30 +70,34 @@ class TwoImagesStateView(state_view.StateView):
 
 class DarkChessStateView(TwoImagesStateView):
   def update(self, state: pyspiel.State):
-    fen = str(state)
-    board = chess.Board(fen)
-    observation = make_observation(state.get_game())
+    try:
+      fen = str(state)
+      board = chess.Board(fen)
+      observation = make_observation(state.get_game())
 
-    for player in range(2):
-      observation.set_from(state, player)
-      self.write_image(board, observation, player)
+      for player in range(2):
+        observation.set_from(state, player)
+        self.write_image(board, observation, player)
+    except:  # Might throw if we use a different board size than 8.
+      pass   # Ignore rendering then.
 
   def write_image(self, board, observation, player):
     # Merge all public observations
     public_obs = observation.dict["public_empty_pieces"]  # np.array
-    for k,v in observation.dict.items():
-      if k.startswith("public_"):
-        public_obs = np.max((public_obs, v), axis=0)
+    for key, obs in observation.dict.items():
+      if key.startswith("public_"):
+        public_obs = np.max((public_obs, obs), axis=0)
     public_squares = np.where(public_obs.T.flatten())[0].tolist()
 
     unknown_obs = [v for k, v in observation.dict.items()
                    if k.endswith("unknown_squares")][0]
-    hidden_squares = np.where((1-unknown_obs).T.flatten())[0].tolist()
+    hidden_obs = unknown_obs - public_obs
+    hidden_squares = np.where(hidden_obs.T.flatten())[0].tolist()
 
     svg = svg_to_string(svg_dark_board(
         public_squares=public_squares,
         hidden_squares=hidden_squares,
-        board=board, size=300))
+        board=board, size=250))
     loader = GdkPixbuf.PixbufLoader()
     loader.write(svg.encode())
     loader.close()
