@@ -8,12 +8,15 @@ from open_spiel.python.observation import make_observation
 import pyspiel
 import xml.etree.ElementTree as ET
 
-import spielviz.ui.games.chess_svg as chess_svg
+import spielviz.third_party.chess_svg as chess_svg
 import spielviz.ui.views.state_view as state_view
 
 # Specific styles that should be applied for highlighting public/hidden squares.
-PUBLIC = """<g id="public"><path d="M2 2 L2 42 L42 42 L42 2 Z" stroke="#abdbe3" stroke-width="4" fill-opacity="0.0" /></g>"""
-HIDDEN = """<g id="hidden"><path d="M0 0 L0 45 L45 45 L45 0 Z" fill="#000" fill-opacity="0.60" /></g>"""
+
+PUBLIC_SQUARE_SVG = """<g id="public"><path d="M2 2 L2 42 L42 42 L42 2 Z"
+stroke="#abdbe3" stroke-width="4" fill-opacity="0.0" /></g>"""
+HIDDEN_SQUARE_SVG = """<g id="hidden"><path d="M0 0 L0 45 L45 45 L45 0 Z"
+fill="#000" fill-opacity="0.60" /></g>"""
 
 
 def svg_dark_board(public_squares: List[chess.Square] = [],
@@ -24,8 +27,8 @@ def svg_dark_board(public_squares: List[chess.Square] = [],
                    **kwargs) -> ET.Element:
   svg = chess_svg.board(**kwargs)
   defs = ET.SubElement(svg, "defs")
-  defs.append(ET.fromstring(PUBLIC))
-  defs.append(ET.fromstring(HIDDEN))
+  defs.append(ET.fromstring(PUBLIC_SQUARE_SVG))
+  defs.append(ET.fromstring(HIDDEN_SQUARE_SVG))
 
   public_set = chess.SquareSet(public_squares)
   hidden_set = chess.SquareSet(hidden_squares)
