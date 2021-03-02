@@ -109,8 +109,9 @@ class ObservationsView:
         for name, tensor in self.observation.dict.items():
           for ln in _format_tensor(tensor, name):
             self.ttv.appendln(ln)
-      except RuntimeError:
+      except RuntimeError as e:
         self.ttv.appendln(" (not available)", TAG_NOTE)
+        logging.debug(e)
 
       self.ttv.append("\nString:", TAG_SECTION)
       try:
@@ -121,8 +122,9 @@ class ObservationsView:
           self.ttv.append("\n" + obs_string)
         else:
           self.ttv.append(" (empty)", TAG_NOTE)
-      except RuntimeError:
+      except RuntimeError as e:
         self.ttv.append(" (not available)", TAG_NOTE)
+        logging.debug(e)
     else:
       self.ttv.appendln("Observation is not available:", TAG_NOTE)
       self.ttv.appendln(
