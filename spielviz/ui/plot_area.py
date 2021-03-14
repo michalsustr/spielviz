@@ -51,7 +51,6 @@ class PlotArea(GObject.GObject):
     self.drag_action = actions.NullAction(self)
     self.presstime = None
     self.highlight = None
-    self.highlight_search = False
 
   def update(self, state: pyspiel.State, **kwargs):
     gametree = GameTreeViz(state=state, **kwargs)
@@ -105,14 +104,7 @@ class PlotArea(GObject.GObject):
     self.y = y
     self.area.queue_draw()
 
-  def set_highlight(self, items: Optional[Set[elements.Node]],
-      search: bool = False) -> None:
-    # Enable or disable search highlight
-    if search:
-      self.highlight_search = items is not None
-    # Ignore cursor highlight while searching
-    if self.highlight_search and not search:
-      return
+  def set_highlight(self, items: Optional[Set[elements.Node]] = None) -> None:
     if self.highlight != items:
       self.highlight = items
       self.area.queue_draw()
