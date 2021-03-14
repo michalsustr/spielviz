@@ -7,7 +7,7 @@ from gi.repository import GObject, Gdk, Gtk
 class PressState:
   x: int = 0
   y: int = 0
-  time: int = 0
+  time: float = 0.
 
   def is_click(self, event: EventButton, click_fuzz: int = 4,
                click_timeout: float = 1.0) -> bool:
