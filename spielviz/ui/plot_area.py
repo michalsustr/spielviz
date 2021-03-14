@@ -54,8 +54,6 @@ class PlotArea(GObject.GObject):
     self.graph_x, self.graph_y = 0.0, 0.0
     # Use coordinate values as the ones lay out by xdot.
     self.zoom_ratio: float = 1
-
-    self.animation = animation.NoAnimation(self)
     # When user presses a button, what drag action should be done?
     self.drag_action = actions.NullAction(self)
     # Differentiate between clicking and dragging in the plot area.
@@ -230,7 +228,6 @@ class PlotArea(GObject.GObject):
     self._draw_graph(cr, rect)
 
   def on_area_button_press(self, area, event: EventButton) -> bool:
-    self.animation.stop()
     self.drag_action.abort()
     action_type = actions.get_drag_action(event)
     self.drag_action = action_type(self)
@@ -275,10 +272,6 @@ class PlotArea(GObject.GObject):
 
   def on_area_size_allocate(self, area, allocation: Rectangle) -> None:
     self.zoom_to_fit()
-
-  def animate_to(self, x, y):
-    self.animation = animation.ZoomToAnimation(self, x, y)
-    self.animation.start()
 
   def window2graph(self, x: int, y: int) -> Tuple[float, float]:
     rect = self.area.get_allocation()
