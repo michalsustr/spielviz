@@ -1,19 +1,20 @@
 import logging
 import math
 import time
-from typing import Optional, Set, Tuple, Type
+from typing import Set, Tuple, Type
 
-import pyspiel
 import cairo
+import pyspiel
 from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
 
 import spielviz.config as cfg
 import spielviz.graphics.elements as elements
-from spielviz.dot.parser import make_graph, make_parser, make_xdotcode
+from spielviz.dot.parser import make_graph, make_xdotcode
 from spielviz.logic.dotcode_tree import GameTreeViz
 from spielviz.ui import actions, animation, spielviz_events
+
 
 class PlotArea(GObject.GObject):
   """GTK widget that draws dot graphs."""
@@ -25,11 +26,12 @@ class PlotArea(GObject.GObject):
   def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
     GObject.GObject.__init__(self)
 
+    # Gtk objects
     self.area = draw_area
-    self.window = window  # MainWindow, no type signature because of cyclic ref.
-    self.graph = elements.Graph()
-
     self.area.set_can_focus(True)
+    self.window = window  # MainWindow, no type signature because of cyclic ref.
+
+    # Event listeners.
     self.area.connect("draw", self.on_draw)
     self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
                          Gdk.EventMask.BUTTON_RELEASE_MASK)
@@ -44,13 +46,18 @@ class PlotArea(GObject.GObject):
     self.area.connect("size-allocate", self.on_area_size_allocate)
     self.area.connect('key-press-event', self.on_key_press_event)
 
+    # Underlying x-dotted graph (with positions)
+    self.graph = elements.Graph()
+    # Set of nodes to highlight.
+    self.highlight: Set[elements.Node] = set()
+
     self.x, self.y = 0.0, 0.0
     self.zoom_ratio = 1.0
     self.zoom_to_fit_on_resize = True
     self.animation = animation.NoAnimation(self)
     self.drag_action = actions.NullAction(self)
     self.presstime = None
-    self.highlight = None
+
 
   def update(self, state: pyspiel.State, **kwargs):
     gametree = GameTreeViz(state=state, **kwargs)
@@ -104,7 +111,7 @@ class PlotArea(GObject.GObject):
     self.y = y
     self.area.queue_draw()
 
-  def set_highlight(self, items: Optional[Set[elements.Node]] = None) -> None:
+  def set_highlight(self, items: Set[elements.Node] = set()) -> None:
     if self.highlight != items:
       self.highlight = items
       self.area.queue_draw()
