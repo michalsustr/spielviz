@@ -50,12 +50,12 @@ class PlotArea(GObject.GObject):
     self.graph = elements.Graph()
     # Set of nodes to highlight.
     self.highlight: Set[elements.Node] = set()
-
+    # Graph coordinates that should be put in the center of plot area.
     self.graph_x, self.graph_y = 0.0, 0.0
-    self.zoom_ratio = 1.0
-    self.zoom_to_fit_on_resize = True
-    self.animation = animation.NoAnimation(self)
+    # Use coordinate values as the ones lay out by xdot.
+    self.zoom_ratio: float = 1
 
+    self.animation = animation.NoAnimation(self)
     # When user presses a button, what drag action should be done?
     self.drag_action = actions.NullAction(self)
     # Differentiate between clicking and dragging in the plot area.
@@ -86,7 +86,10 @@ class PlotArea(GObject.GObject):
     x, y, ratio = self.graph_x, self.graph_y, self.zoom_ratio
     x0, y0 = x - cx / ratio, y - cy / ratio
     x1, y1 = x0 + w / ratio, y0 + h / ratio
-    bounding = (x0, y0, x1, y1)
+
+    # Bounding box in graph coordinates.
+    bounding = (x0, y0,  # Top-left
+                x1, y1)  # Bottom-right
 
     cr.translate(cx, cy)
     cr.scale(ratio, ratio)
@@ -119,24 +122,30 @@ class PlotArea(GObject.GObject):
       self.highlight = items
       self.area.queue_draw()
 
-  def zoom_image(self, zoom_ratio: float, center: bool = False,
-      pos: None = None) -> None:
+  def zoom_image(self, new_zoom_ratio: float, center: bool = False,
+                 plot_area_xy: Tuple[float, float] = None) -> None:
+    """
+    :param new_zoom_ratio:
+    :param center: Compute graph x,y as the center coordinates.
+    :param plot_area_xy: x,y with (0,0) corresponds to top-left corner
+                         of the plot area. Computes graph x,y based on plot area
+                         x,y
+    """
     # Constrain zoom ratio to a sane range to prevent numeric instability.
-    zoom_ratio = min(zoom_ratio, 1E4)
-    zoom_ratio = max(zoom_ratio, 1E-6)
+    new_zoom_ratio = min(new_zoom_ratio, 1E4)
+    new_zoom_ratio = max(new_zoom_ratio, 1E-6)
 
     if center:
       self.graph_x = self.graph.width / 2
       self.graph_y = self.graph.height / 2
-    elif pos is not None:
+    elif plot_area_xy is not None:
       rect = self.area.get_allocation()
-      x, y = pos
+      x, y = plot_area_xy
       x -= 0.5 * rect.width
       y -= 0.5 * rect.height
-      self.graph_x += x / self.zoom_ratio - x / zoom_ratio
-      self.graph_y += y / self.zoom_ratio - y / zoom_ratio
-    self.zoom_ratio = zoom_ratio
-    self.zoom_to_fit_on_resize = False
+      self.graph_x += x / self.zoom_ratio - x / new_zoom_ratio
+      self.graph_y += y / self.zoom_ratio - y / new_zoom_ratio
+    self.zoom_ratio = new_zoom_ratio
     self.area.queue_draw()
 
   def zoom_to_area(self, x1, y1, x2, y2):
@@ -150,7 +159,6 @@ class PlotArea(GObject.GObject):
           float(rect.width) / float(width),
           float(rect.height) / float(height)
       )
-    self.zoom_to_fit_on_resize = False
     self.graph_x = (x1 + x2) / 2
     self.graph_y = (y1 + y2) / 2
     self.area.queue_draw()
@@ -166,7 +174,6 @@ class PlotArea(GObject.GObject):
         float(rect.height) / float(self.graph.height)
     )
     self.zoom_image(zoom_ratio, center=True)
-    self.zoom_to_fit_on_resize = True
 
   ZOOM_INCREMENT = 1.25
   ZOOM_TO_FIT_MARGIN = 12
@@ -251,14 +258,14 @@ class PlotArea(GObject.GObject):
 
     return event.button in (Gdk.BUTTON_PRIMARY, Gdk.BUTTON_MIDDLE)
 
-  def on_area_scroll_event(self, area, event):
+  def on_area_scroll_event(self, area, event: EventButton):
     if event.direction == Gdk.ScrollDirection.UP:
       self.zoom_image(self.zoom_ratio * self.ZOOM_INCREMENT,
-                      pos=(event.x, event.y))
+                      plot_area_xy=(event.x, event.y))
       return True
     if event.direction == Gdk.ScrollDirection.DOWN:
       self.zoom_image(self.zoom_ratio / self.ZOOM_INCREMENT,
-                      pos=(event.x, event.y))
+                      plot_area_xy=(event.x, event.y))
       return True
     return False
 
@@ -267,8 +274,7 @@ class PlotArea(GObject.GObject):
     return True
 
   def on_area_size_allocate(self, area, allocation: Rectangle) -> None:
-    if self.zoom_to_fit_on_resize:
-      self.zoom_to_fit()
+    self.zoom_to_fit()
 
   def animate_to(self, x, y):
     self.animation = animation.ZoomToAnimation(self, x, y)
