@@ -4,17 +4,16 @@ import time
 from typing import Optional, Set, Tuple, Type
 
 import pyspiel
-from cairo import Context
+import cairo
 from gi.overrides.Gdk import EventButton, EventMotion
 from gi.repository import GObject, Gdk, Gtk
 from gi.repository.Gdk import Rectangle
 
 import spielviz.config as cfg
-from spielviz.dot.parser import make_graph, make_xdotcode
-from spielviz.graphics.elements import Graph, Node, Element
+import spielviz.graphics.elements as elements
+from spielviz.dot.parser import make_graph, make_parser, make_xdotcode
 from spielviz.logic.dotcode_tree import GameTreeViz
 from spielviz.ui import actions, animation
-
 
 class PlotArea(GObject.GObject):
   """GTK widget that draws dot graphs."""
@@ -28,7 +27,7 @@ class PlotArea(GObject.GObject):
 
     self.area = draw_area
     self.window = window  # MainWindow, no type signature because of cyclic ref.
-    self.graph = Graph()
+    self.graph = elements.Graph()
 
     self.area.set_can_focus(True)
     self.area.connect("draw", self.on_draw)
@@ -75,7 +74,7 @@ class PlotArea(GObject.GObject):
     self.zoom_to_fit()
     self.area.queue_draw()
 
-  def _draw_graph(self, cr: Context, rect: Rectangle) -> None:
+  def _draw_graph(self, cr: cairo.Context, rect: Rectangle) -> None:
     w, h = float(rect.width), float(rect.height)
     cx, cy = 0.5 * w, 0.5 * h
     x, y, ratio = self.x, self.y, self.zoom_ratio
@@ -88,7 +87,7 @@ class PlotArea(GObject.GObject):
     cr.translate(-x, -y)
     self.graph.draw(cr, highlight_items=self.highlight, bounding=bounding)
 
-  def on_draw(self, widget, cr: Context) -> bool:
+  def on_draw(self, widget, cr: cairo.Context) -> bool:
     rect = self.area.get_allocation()
     Gtk.render_background(self.area.get_style_context(), cr, 0, 0,
                           rect.width, rect.height)
@@ -109,7 +108,7 @@ class PlotArea(GObject.GObject):
     self.y = y
     self.area.queue_draw()
 
-  def set_highlight(self, items: Optional[Set[Node]],
+  def set_highlight(self, items: Optional[Set[elements.Node]],
       search: bool = False) -> None:
     # Enable or disable search highlight
     if search:
@@ -273,11 +272,11 @@ class PlotArea(GObject.GObject):
     return (time.time() < self.presstime + click_timeout and
             math.hypot(deltax, deltay) < click_fuzz)
 
-  def on_click(self, element: Element, event: EventButton) -> bool:
+  def on_click(self, element: elements.Element, event: EventButton) -> bool:
     """Override this method in subclass to process
     click events. Note that element can be None
     (click on empty space)."""
-    if isinstance(element, Node):
+    if isinstance(element, elements.Node):
       history_str = element.id.decode().strip()
       self.emit("change_history", history_str)
     return False
@@ -366,7 +365,7 @@ class PlotArea(GObject.GObject):
     y += self.y
     return x, y
 
-  def get_element(self, x: int, y: int) -> Node:
+  def get_element(self, x: int, y: int) -> elements.Node:
     x, y = self.window2graph(x, y)
     return self.graph.get_element(x, y)
 
