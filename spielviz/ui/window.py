@@ -9,6 +9,7 @@ import spielviz.config as cfg
 from spielviz.logic.game_selector import game_parameter_populator, list_games
 from spielviz.logic.state_history import state_from_history_str
 from spielviz.resources import get_resource_path
+import spielviz.ui.spielviz_events as spielviz_events
 from spielviz.ui.games import is_custom_view_registed, create_custom_state_view
 from spielviz.ui.history_entry import HistoryEntry
 from spielviz.ui.plot_area import PlotArea
@@ -78,7 +79,7 @@ class MainWindow:
     self.window.set_icon_from_file(ICON_FILE)
 
     self.plot_area = PlotArea(builder.get_object("plot_area"), self)
-    self.plot_area.connect("change_history", self.change_history)
+    self.plot_area.connect(spielviz_events.CHANGE_HISTORY, self.change_history)
     self.state_view_container = builder.get_object("state_view")
 
     self.state_str_view = StateStrView(builder.get_object("state_str_view"))

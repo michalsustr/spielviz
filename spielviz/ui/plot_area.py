@@ -13,13 +13,13 @@ import spielviz.config as cfg
 import spielviz.graphics.elements as elements
 from spielviz.dot.parser import make_graph, make_parser, make_xdotcode
 from spielviz.logic.dotcode_tree import GameTreeViz
-from spielviz.ui import actions, animation
+from spielviz.ui import actions, animation, spielviz_events
 
 class PlotArea(GObject.GObject):
   """GTK widget that draws dot graphs."""
 
   __gsignals__ = {
-    'change_history': (GObject.SIGNAL_RUN_LAST, None, (str,))
+    spielviz_events.CHANGE_HISTORY: (GObject.SIGNAL_RUN_LAST, None, (str,))
   }
 
   def __init__(self, draw_area: Gtk.DrawingArea, window) -> None:
@@ -275,7 +275,7 @@ class PlotArea(GObject.GObject):
     (click on empty space)."""
     if isinstance(element, elements.Node):
       history_str = element.id.decode().strip()
-      self.emit("change_history", history_str)
+      self.emit(spielviz_events.CHANGE_HISTORY, history_str)
     return False
 
   def on_area_button_release(self, area, event: EventButton) -> bool:
