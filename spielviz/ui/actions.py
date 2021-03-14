@@ -67,8 +67,8 @@ class PanAction(DragAction):
         Gdk.Cursor(Gdk.CursorType.FLEUR))
 
   def drag(self, deltax, deltay):
-    self.plot_area.x += deltax / self.plot_area.zoom_ratio
-    self.plot_area.y += deltay / self.plot_area.zoom_ratio
+    self.plot_area.graph_x += deltax / self.plot_area.zoom_ratio
+    self.plot_area.graph_y += deltay / self.plot_area.zoom_ratio
     self.plot_area.area.queue_draw()
 
   def stop(self) -> None:

@@ -276,37 +276,6 @@ class MainWindow:
                           lookahead=self.lookahead)
     self.plot_area.show_all()
 
-  def find_text(self, entry_text):
-    found_items = []
-    dot_widget = self.plot_area
-    regexp = re.compile(entry_text)
-    for element in dot_widget.graph.nodes + dot_widget.graph.edges:
-      if element.search_text(regexp):
-        found_items.append(element)
-    return found_items
-
-  def textentry_changed(self, widget, entry):
-    entry_text = entry.get_text()
-    dot_widget = self.plot_area
-    if not entry_text:
-      dot_widget.set_highlight(None, search=True)
-      return
-
-    found_items = self.find_text(entry_text)
-    dot_widget.set_highlight(found_items, search=True)
-
-  def textentry_activate(self, widget, entry):
-    entry_text = entry.get_text()
-    dot_widget = self.plot_area
-    if not entry_text:
-      dot_widget.set_highlight(None, search=True)
-      return
-
-    found_items = self.find_text(entry_text)
-    dot_widget.set_highlight(found_items, search=True)
-    if (len(found_items) == 1):
-      dot_widget.animate_to(found_items[0].x, found_items[0].y)
-
   def on_reload(self, action):
     self.plot_area.reload()
 

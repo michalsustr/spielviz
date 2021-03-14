@@ -51,12 +51,13 @@ class PlotArea(GObject.GObject):
     # Set of nodes to highlight.
     self.highlight: Set[elements.Node] = set()
 
-    self.x, self.y = 0.0, 0.0
+    self.graph_x, self.graph_y = 0.0, 0.0
     self.zoom_ratio = 1.0
     self.zoom_to_fit_on_resize = True
     self.animation = animation.NoAnimation(self)
-    self.drag_action = actions.NullAction(self)
 
+    # When user presses a button, what drag action should be done?
+    self.drag_action = actions.NullAction(self)
     # Differentiate between clicking and dragging in the plot area.
     self.press_state = press_state.PressState()
 
@@ -82,7 +83,7 @@ class PlotArea(GObject.GObject):
   def _draw_graph(self, cr: cairo.Context, rect: Rectangle) -> None:
     w, h = float(rect.width), float(rect.height)
     cx, cy = 0.5 * w, 0.5 * h
-    x, y, ratio = self.x, self.y, self.zoom_ratio
+    x, y, ratio = self.graph_x, self.graph_y, self.zoom_ratio
     x0, y0 = x - cx / ratio, y - cy / ratio
     x1, y1 = x0 + w / ratio, y0 + h / ratio
     bounding = (x0, y0, x1, y1)
@@ -106,11 +107,11 @@ class PlotArea(GObject.GObject):
     return False
 
   def get_current_pos(self):
-    return self.x, self.y
+    return self.graph_x, self.graph_y
 
   def set_current_pos(self, x, y):
-    self.x = x
-    self.y = y
+    self.graph_x = x
+    self.graph_y = y
     self.area.queue_draw()
 
   def set_highlight(self, items: Set[elements.Node] = set()) -> None:
@@ -125,15 +126,15 @@ class PlotArea(GObject.GObject):
     zoom_ratio = max(zoom_ratio, 1E-6)
 
     if center:
-      self.x = self.graph.width / 2
-      self.y = self.graph.height / 2
+      self.graph_x = self.graph.width / 2
+      self.graph_y = self.graph.height / 2
     elif pos is not None:
       rect = self.area.get_allocation()
       x, y = pos
       x -= 0.5 * rect.width
       y -= 0.5 * rect.height
-      self.x += x / self.zoom_ratio - x / zoom_ratio
-      self.y += y / self.zoom_ratio - y / zoom_ratio
+      self.graph_x += x / self.zoom_ratio - x / zoom_ratio
+      self.graph_y += y / self.zoom_ratio - y / zoom_ratio
     self.zoom_ratio = zoom_ratio
     self.zoom_to_fit_on_resize = False
     self.area.queue_draw()
@@ -150,8 +151,8 @@ class PlotArea(GObject.GObject):
           float(rect.height) / float(height)
       )
     self.zoom_to_fit_on_resize = False
-    self.x = (x1 + x2) / 2
-    self.y = (y1 + y2) / 2
+    self.graph_x = (x1 + x2) / 2
+    self.graph_y = (y1 + y2) / 2
     self.area.queue_draw()
 
   def zoom_to_fit(self) -> None:
@@ -169,36 +170,23 @@ class PlotArea(GObject.GObject):
 
   ZOOM_INCREMENT = 1.25
   ZOOM_TO_FIT_MARGIN = 12
-
-  def on_zoom_in(self, action):
-    self.zoom_image(self.zoom_ratio * self.ZOOM_INCREMENT)
-
-  def on_zoom_out(self, action):
-    self.zoom_image(self.zoom_ratio / self.ZOOM_INCREMENT)
-
-  def on_zoom_fit(self, action):
-    self.zoom_to_fit()
-
-  def on_zoom_100(self, action):
-    self.zoom_image(1.0)
-
   POS_INCREMENT = 100
 
   def on_key_press_event(self, widget, event):
     if event.keyval == Gdk.KEY_Left:
-      self.x -= self.POS_INCREMENT / self.zoom_ratio
+      self.graph_x -= self.POS_INCREMENT / self.zoom_ratio
       self.area.queue_draw()
       return True
     if event.keyval == Gdk.KEY_Right:
-      self.x += self.POS_INCREMENT / self.zoom_ratio
+      self.graph_x += self.POS_INCREMENT / self.zoom_ratio
       self.area.queue_draw()
       return True
     if event.keyval == Gdk.KEY_Up:
-      self.y -= self.POS_INCREMENT / self.zoom_ratio
+      self.graph_y -= self.POS_INCREMENT / self.zoom_ratio
       self.area.queue_draw()
       return True
     if event.keyval == Gdk.KEY_Down:
-      self.y += self.POS_INCREMENT / self.zoom_ratio
+      self.graph_y += self.POS_INCREMENT / self.zoom_ratio
       self.area.queue_draw()
       return True
     if event.keyval in (Gdk.KEY_Page_Up,
@@ -292,8 +280,8 @@ class PlotArea(GObject.GObject):
     y -= 0.5 * rect.height
     x /= self.zoom_ratio
     y /= self.zoom_ratio
-    x += self.x
-    y += self.y
+    x += self.graph_x
+    y += self.graph_y
     return x, y
 
   def get_element(self, x: int, y: int) -> elements.Node:

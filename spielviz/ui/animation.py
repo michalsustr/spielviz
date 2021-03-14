@@ -62,16 +62,16 @@ class LinearAnimation(Animation):
 class MoveToAnimation(LinearAnimation):
   def __init__(self, plot_area, target_x, target_y):
     Animation.__init__(self, plot_area)
-    self.source_x = plot_area.x
-    self.source_y = plot_area.y
+    self.source_x = plot_area.graph_x
+    self.source_y = plot_area.graph_y
     self.target_x = target_x
     self.target_y = target_y
 
   def animate(self, t):
     sx, sy = self.source_x, self.source_y
     tx, ty = self.target_x, self.target_y
-    self.plot_area.x = tx * t + sx * (1 - t)
-    self.plot_area.y = ty * t + sy * (1 - t)
+    self.plot_area.graph_x = tx * t + sx * (1 - t)
+    self.plot_area.graph_y = ty * t + sy * (1 - t)
     self.plot_area.area.queue_draw()
 
 
