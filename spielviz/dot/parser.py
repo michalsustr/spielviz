@@ -573,6 +573,10 @@ def make_xdotcode(dotcode: bytes, filter: str = cfg.GRAPHVIZ_FILTER) -> bytes:
   return xdotcode
 
 
+def make_parser(xdotcode: bytes) -> XDotParser:
+  return XDotParser(xdotcode)
+
+
 def make_graph(xdotcode: bytes) -> elements.Graph:
   parser = XDotParser(xdotcode)
   return parser.parse()
