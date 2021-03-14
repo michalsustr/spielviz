@@ -1,9 +1,7 @@
 from cairo import Context
 from gi.overrides.Gdk import EventButton, EventMotion
-from gi.repository import Gdk
-
-
-# from spielviz.ui.area import PlotArea
+from gi.repository import Gdk, Gtk
+from typing import Type
 
 
 class DragAction(object):
@@ -117,3 +115,16 @@ class ZoomAreaAction(DragAction):
 
   def abort(self):
     self.plot_area.area.queue_draw()
+
+
+def get_drag_action(event: EventButton) -> Type[DragAction]:
+  state = event.state
+  if event.button in (Gdk.BUTTON_PRIMARY, Gdk.BUTTON_MIDDLE):
+    modifiers = Gtk.accelerator_get_default_mod_mask()
+    if state & modifiers == Gdk.ModifierType.CONTROL_MASK:
+      return ZoomAction
+    elif state & modifiers == Gdk.ModifierType.SHIFT_MASK:
+      return ZoomAreaAction
+    else:
+      return PanAction
+  return NullAction

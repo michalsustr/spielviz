@@ -1,7 +1,7 @@
 import logging
 import math
 import time
-from typing import Set, Tuple, Type
+from typing import Set, Tuple
 
 import cairo
 import pyspiel
@@ -13,7 +13,7 @@ import spielviz.config as cfg
 import spielviz.graphics.elements as elements
 from spielviz.dot.parser import make_graph, make_xdotcode
 from spielviz.logic.dotcode_tree import GameTreeViz
-from spielviz.ui import actions, animation, spielviz_events
+from spielviz.ui import actions, animation, spielviz_events, press_state
 
 
 class PlotArea(GObject.GObject):
@@ -56,7 +56,9 @@ class PlotArea(GObject.GObject):
     self.zoom_to_fit_on_resize = True
     self.animation = animation.NoAnimation(self)
     self.drag_action = actions.NullAction(self)
-    self.presstime = None
+
+    # Differentiate between clicking and dragging in the plot area.
+    self.press_state = press_state.PressState()
 
 
   def update(self, state: pyspiel.State, **kwargs):
@@ -232,41 +234,14 @@ class PlotArea(GObject.GObject):
     rect = self.area.get_allocation()
     self._draw_graph(cr, rect)
 
-  def get_drag_action(self, event: EventButton) -> Type[actions.DragAction]:
-    state = event.state
-    if event.button in (1, 2):  # left or middle button
-      modifiers = Gtk.accelerator_get_default_mod_mask()
-      if state & modifiers == Gdk.ModifierType.CONTROL_MASK:
-        return actions.ZoomAction
-      elif state & modifiers == Gdk.ModifierType.SHIFT_MASK:
-        return actions.ZoomAreaAction
-      else:
-        return actions.PanAction
-    return actions.NullAction
-
   def on_area_button_press(self, area, event: EventButton) -> bool:
     self.animation.stop()
     self.drag_action.abort()
-    action_type = self.get_drag_action(event)
+    action_type = actions.get_drag_action(event)
     self.drag_action = action_type(self)
     self.drag_action.on_button_press(event)
-    self.presstime = time.time()
-    self.pressx = event.x
-    self.pressy = event.y
+    self.press_state.update(event)
     return False
-
-  def is_click(self, event: EventButton, click_fuzz: int = 4,
-      click_timeout: float = 1.0) -> bool:
-    assert event.type == Gdk.EventType.BUTTON_RELEASE
-    if self.presstime is None:
-      # got a button release without seeing the press?
-      return False
-    # XXX instead of doing this complicated logic, shouldn't we listen
-    # for gtk's clicked event instead?
-    deltax = self.pressx - event.x
-    deltay = self.pressy - event.y
-    return (time.time() < self.presstime + click_timeout and
-            math.hypot(deltax, deltay) < click_fuzz)
 
   def on_click(self, element: elements.Element, event: EventButton) -> bool:
     """Override this method in subclass to process
@@ -281,21 +256,12 @@ class PlotArea(GObject.GObject):
     self.drag_action.on_button_release(event)
     self.drag_action = actions.NullAction(self)
     x, y = int(event.x), int(event.y)
-    if self.is_click(event):
+    if self.press_state.is_click(event):
       el = self.get_element(x, y)
       if self.on_click(el, event):
         return True
 
-      # if event.button == 1:
-      #   jump = self.get_jump(x, y)
-      #   if jump is not None:
-      #     self.animate_to(jump.x, jump.y)
-      #
-      #   return True
-
-    if event.button == 1 or event.button == 2:
-      return True
-    return False
+    return event.button in (Gdk.BUTTON_PRIMARY, Gdk.BUTTON_MIDDLE)
 
   def on_area_scroll_event(self, area, event):
     if event.direction == Gdk.ScrollDirection.UP:
