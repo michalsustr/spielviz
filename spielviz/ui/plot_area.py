@@ -42,7 +42,6 @@ class PlotArea(GObject.GObject):
     self.area.connect("motion-notify-event", self.on_area_motion_notify)
     self.area.connect("scroll-event", self.on_area_scroll_event)
     self.area.connect("size-allocate", self.on_area_size_allocate)
-
     self.area.connect('key-press-event', self.on_key_press_event)
 
     self.x, self.y = 0.0, 0.0
@@ -53,8 +52,6 @@ class PlotArea(GObject.GObject):
     self.presstime = None
     self.highlight = None
     self.highlight_search = False
-    self.gui_history_back = []
-    self.gui_history_forward = []
 
   def update(self, state: pyspiel.State, **kwargs):
     gametree = GameTreeViz(state=state, **kwargs)
@@ -321,39 +318,8 @@ class PlotArea(GObject.GObject):
       self.zoom_to_fit()
 
   def animate_to(self, x, y):
-    del self.gui_history_forward[:]
-    self.gui_history_back.append(self.get_current_pos())
-    self.gui_history_changed()
-    self._animate_to(x, y)
-
-  def _animate_to(self, x, y):
     self.animation = animation.ZoomToAnimation(self, x, y)
     self.animation.start()
-
-  def gui_history_changed(self):
-    # self.area.get_allocation(
-    #       'history',
-    #       bool(self.history_back),
-    #       bool(self.history_forward))
-    pass
-
-  def on_go_back(self, action=None):
-    try:
-      item = self.gui_history_back.pop()
-    except LookupError:
-      return
-    self.gui_history_forward.append(self.get_current_pos())
-    self.gui_history_changed()
-    self._animate_to(*item)
-
-  def on_go_forward(self, action=None):
-    try:
-      item = self.gui_history_forward.pop()
-    except LookupError:
-      return
-    self.gui_history_back.append(self.get_current_pos())
-    self.gui_history_changed()
-    self._animate_to(*item)
 
   def window2graph(self, x: int, y: int) -> Tuple[float, float]:
     rect = self.area.get_allocation()
