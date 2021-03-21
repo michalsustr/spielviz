@@ -87,6 +87,8 @@ class MainWindow:
 
     self.game_information_view = GameInformationView(
         builder.get_object("game_information"))
+    self.game_information_view.connect(spielviz_events.CHANGE_GAME,
+                                       self.change_game)
 
     self.player_view = PlayerView(builder.get_object("player"))
 
@@ -214,6 +216,9 @@ class MainWindow:
     except pyspiel.SpielError as e:
       self.error_dialog(f"Could not seek to history '{history_str}': {e}")
 
+  def change_game(self, origin_object: GObject, game_name: str):
+    self.set_game_from_name(game_name)
+
   def update_game(self, combo_box: CompletingComboBoxText, game_name: str):
     self.set_game_from_name(game_name)
 
@@ -234,7 +239,7 @@ class MainWindow:
     self.state = None
     self.state_view = create_state_view(self.game, self.state_view_container)
     self.game_information_view.update(game)
-
+    self.select_game.set_text(str(game))
     # The number of players may change when we update the game.
     # Window manages the state of the observing_player so we update it here too.
     if self.observing_player is not None \

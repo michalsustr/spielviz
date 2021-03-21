@@ -67,3 +67,7 @@ class CompletingComboBoxText(Gtk.ComboBoxText):
     else:
       # Restore the default static options
       completion.set_model(self.static_options_model)
+
+  def set_text(self, text: str):
+    entry = self.get_child()
+    entry.set_text(text)

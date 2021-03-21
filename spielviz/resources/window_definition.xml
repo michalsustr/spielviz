@@ -261,19 +261,16 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkBox">
-                            <child>
-                              <object class="GtkTextView" id="game_information">
-                                <property name="cursor_visible">False</property>
-                                <property name="accepts_tab">False</property>
-                                <property name="editable">False</property>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                              </packing>
-                            </child>
+                          <object class="GtkGrid" id="game_information">
+                            <property name="orientation">vertical</property>
+                            <property name="margin">2</property>
+                            <property name="column_spacing">2</property>
+                            <property name="row_spacing">2</property>
                           </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                          </packing>
                         </child>
                       </object>
                     </child>
